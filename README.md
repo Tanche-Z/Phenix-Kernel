@@ -1,2 +1,2 @@
-# Phenix-Kernel
-The kernel of Phenix OS.
+# Pheonix
+The kernel of Pheonix OS.
