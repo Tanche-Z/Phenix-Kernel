@@ -1,4 +1,4 @@
 **/bx_enh_dbg.ini
 **/*.bin
 **/*.img
-**/bochsrc
+#**/bochsrc
