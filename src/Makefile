@@ -21,4 +21,5 @@ clean:
 
 .PHONY: bochs
 bochs: master.img
-	bochs-debugger -q
+#	bochs-debugger -q
+	bochs -q
