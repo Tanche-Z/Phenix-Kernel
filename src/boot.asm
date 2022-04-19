@@ -29,14 +29,171 @@ mov sp, 0x7c00
 ; mov byte [24],'!'
 ; mov byte [26],'!'
 
-xchg bx, bx ; bochs magic break
-
-
 mov si, booting
 call print
 
+xchg bx, bx ; bochs magic break
+
+mov edi, 0x1000; read target memory
+mov ecx, 0; start sector
+mov bl, 1; sector count
+call read_disk
+
+xchg bx, bx ; bochs magic break
+
+mov edi, 0x1000; read target memory
+mov ecx, 1; start sector
+mov bl, 1; sector count
+call write_disk
+
+xchg bx, bx ; bochs magic break
+
 ; block
 jmp $
+
+read_disk:
+
+    ; set the number of reading/writing sectors
+    mov dx, 0x1f2
+    mov al, bl
+    out dx, al
+    
+    inc dx; 0x1f3
+    mov al, cl; the low 8 bits of start sector 
+    out dx, al
+
+    inc dx; 0x1f4
+    shr ecx, 8
+    mov al, cl
+    out dx, al
+
+    inc dx; 0x1f5
+    shr ecx, 8
+    mov al, cl; the high 8 bits of start sector 
+    out dx, al
+
+    inc dx; 0x1f6
+    shr ecx, 8
+    and cl, 0b1111; set high 4 bit as 0
+
+    mov al, 0b1110_0000;
+    or al, cl
+    out dx, al ;LBA mdoe
+
+    inc dx; 0x1f7
+    mov al, 0x20 ; read hard disk
+    out dx, al
+
+    xor ecx, ecx; clear ecx
+    ;mov ecx, 0
+
+    mov cl, bl ; get the count of read/write sectors
+
+    .read:
+        push cx; store cx
+        call .waits;wait for data ready
+        call .reads; read a sector
+        pop cx; restore xc
+        loop .read
+
+    ret
+
+    .waits:
+        mov dx, 0x1f7
+        .check:
+            in al, dx
+            jmp $+2;jump to next line
+            jmp $+2
+            jmp $+2
+            and al, 0b1000_1000
+            cmp al, 0b0000_1000
+            jnz .check
+        ret
+
+    .reads:
+        mov dx, 0x1f0
+        mov cx, 256
+        .readw:
+            in ax,dx
+            jmp $+2
+            jmp $+2
+            jmp $+2
+            mov [edi], ax
+            add edi, 2
+            loop .readw
+        ret
+
+write_disk:
+
+    ; set the number of reading/writing sectors
+    mov dx, 0x1f2
+    mov al, bl
+    out dx, al
+    
+    inc dx; 0x1f3
+    mov al, cl; the low 8 bits of start sector 
+    out dx, al
+
+    inc dx; 0x1f4
+    shr ecx, 8
+    mov al, cl
+    out dx, al
+
+    inc dx; 0x1f5
+    shr ecx, 8
+    mov al, cl; the high 8 bits of start sector 
+    out dx, al
+
+    inc dx; 0x1f6
+    shr ecx, 8
+    and cl, 0b1111; set high 4 bit as 0
+
+    mov al, 0b1110_0000;
+    or al, cl
+    out dx, al ;LBA mdoe
+
+    inc dx; 0x1f7
+    mov al, 0x30 ; write hard disk
+    out dx, al
+
+    xor ecx, ecx; clear ecx
+    ;mov ecx, 0
+
+    mov cl, bl ; get the count of read/write sectors
+
+    .write:
+        push cx; store cx
+        call .writes; write a sector
+        call .waits; wait for end of busy hard disk
+        pop cx; restore xc
+        loop .write
+
+    ret
+
+    .waits:
+        mov dx, 0x1f7
+        .check:
+            in al, dx
+            jmp $+2;jump to next line
+            jmp $+2
+            jmp $+2
+            and al, 0b1000_0000
+            cmp al, 0b0000_0000
+            jnz .check
+        ret
+
+    .writes:
+        mov dx, 0x1f0
+        mov cx, 256
+        .writew:
+            mov ax, [edi]
+            out dx, ax
+            jmp $+2
+            jmp $+2
+            jmp $+2
+            add edi, 2
+            loop .writew
+        ret
 
 print:
     mov ah, 0x0e
