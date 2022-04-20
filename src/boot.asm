@@ -32,24 +32,28 @@ mov sp, 0x7c00
 mov si, booting
 call print
 
-xchg bx, bx ; bochs magic break
-
 mov edi, 0x1000; read target memory
-mov ecx, 0; start sector
-mov bl, 1; sector count
+mov ecx, 2; start sector
+mov bl, 4; sector count
 call read_disk
 
-xchg bx, bx ; bochs magic break
+; xchg bx, bx ; bochs magic break
 
-mov edi, 0x1000; read target memory
-mov ecx, 1; start sector
-mov bl, 1; sector count
-call write_disk
+cmp word [0x1000], 0x55aa
+jnz error
 
-xchg bx, bx ; bochs magic break
+jmp 0:0x1002
+
+; mov edi, 0x1000; write target memory
+; mov ecx, 1; start sector
+; mov bl, 1; sector count
+; call write_disk
+
+; xchg bx, bx ; bochs magic break
 
 ; block
 jmp $
+
 
 read_disk:
 
@@ -123,77 +127,77 @@ read_disk:
             loop .readw
         ret
 
-write_disk:
+; write_disk:
 
-    ; set the number of reading/writing sectors
-    mov dx, 0x1f2
-    mov al, bl
-    out dx, al
+;     ; set the number of reading/writing sectors
+;     mov dx, 0x1f2
+;     mov al, bl
+;     out dx, al
     
-    inc dx; 0x1f3
-    mov al, cl; the low 8 bits of start sector 
-    out dx, al
+;     inc dx; 0x1f3
+;     mov al, cl; the low 8 bits of start sector 
+;     out dx, al
 
-    inc dx; 0x1f4
-    shr ecx, 8
-    mov al, cl
-    out dx, al
+;     inc dx; 0x1f4
+;     shr ecx, 8
+;     mov al, cl
+;     out dx, al
 
-    inc dx; 0x1f5
-    shr ecx, 8
-    mov al, cl; the high 8 bits of start sector 
-    out dx, al
+;     inc dx; 0x1f5
+;     shr ecx, 8
+;     mov al, cl; the high 8 bits of start sector 
+;     out dx, al
 
-    inc dx; 0x1f6
-    shr ecx, 8
-    and cl, 0b1111; set high 4 bit as 0
+;     inc dx; 0x1f6
+;     shr ecx, 8
+;     and cl, 0b1111; set high 4 bit as 0
 
-    mov al, 0b1110_0000;
-    or al, cl
-    out dx, al ;LBA mdoe
+;     mov al, 0b1110_0000;
+;     or al, cl
+;     out dx, al ;LBA mdoe
 
-    inc dx; 0x1f7
-    mov al, 0x30 ; write hard disk
-    out dx, al
+;     inc dx; 0x1f7
+;     mov al, 0x30 ; write hard disk
+;     out dx, al
 
-    xor ecx, ecx; clear ecx
-    ;mov ecx, 0
+;     xor ecx, ecx; clear ecx
+;     ;mov ecx, 0
 
-    mov cl, bl ; get the count of read/write sectors
+;     mov cl, bl ; get the count of read/write sectors
 
-    .write:
-        push cx; store cx
-        call .writes; write a sector
-        call .waits; wait for end of busy hard disk
-        pop cx; restore xc
-        loop .write
+;     .write:
+;         push cx; store cx
+;         call .writes; write a sector
+;         call .waits; wait for end of busy hard disk
+;         pop cx; restore xc
+;         loop .write
 
-    ret
+;     ret
 
-    .waits:
-        mov dx, 0x1f7
-        .check:
-            in al, dx
-            jmp $+2;jump to next line
-            jmp $+2
-            jmp $+2
-            and al, 0b1000_0000
-            cmp al, 0b0000_0000
-            jnz .check
-        ret
+;     .waits:
+;         mov dx, 0x1f7
+;         .check:
+;             in al, dx
+;             jmp $+2;jump to next line
+;             jmp $+2
+;             jmp $+2
+;             and al, 0b1000_0000
+;             cmp al, 0b0000_0000
+;             jnz .check
+;         ret
 
-    .writes:
-        mov dx, 0x1f0
-        mov cx, 256
-        .writew:
-            mov ax, [edi]
-            out dx, ax
-            jmp $+2
-            jmp $+2
-            jmp $+2
-            add edi, 2
-            loop .writew
-        ret
+;     .writes:
+;         mov dx, 0x1f0
+;         mov cx, 256
+;         .writew:
+;             mov ax, [edi]
+;             out dx, ax
+;             jmp $+2
+;             jmp $+2
+;             jmp $+2
+;             add edi, 2
+;             loop .writew
+;         ret
 
 print:
     mov ah, 0x0e
@@ -209,7 +213,14 @@ print:
 
 
 booting:
-    db "Booting ph1nix...", 10, 13, 0;\n\r
+    db "Booting ph1nix...", 10, 13, 0 ;\n\r
+
+error:
+    mov si, .msg
+    call print
+    hlt
+    jmp $
+    .msg db "Booting Error!!!", 10, 13,0
 
 times 510 - ($ - $$) db 0
 
