@@ -188,16 +188,16 @@ gdt_base:
     dd 0, 0 ; NULL Discriptor
 gdt_code:
     dw memory_limit & 0xffff ; segment limit 0~15
-    dw memory_base & 0xffff ; base address 0~16
-    db (memory_base >> 16) & 0xff; base address 16~24
+    dw memory_base & 0xffff ; base address 0~15
+    db (memory_base >> 16) & 0xff; base address 16~23
     db 0b_1_00_1_1_0_1_0 ; exist_dpl(discriptor privilege level) is 0_S is Code_ NOT compliance_writable_haven't been accessed
     db 0b1_1_0_0_0000 | (memory_limit >> 16) & 0xf ; 4K_32bit_not 64bit_available to OS_segment limit 16~19
     db (memory_base >> 24) & 0xff ; base address 24~31
 
 gdt_data:
     dw memory_limit & 0xffff ; segment limit 0~15
-    dw memory_base & 0xffff ; base address 0~16
-    db (memory_base >> 16) & 0xff; base address 16~24
+    dw memory_base & 0xffff ; base address 0~15
+    db (memory_base >> 16) & 0xff; base address 16~23
     db 0b_1_00_1_0_0_1_0 ; exist_dpl(discriptor privilege level) is 0_S is Data_upward extend_writable_haven't been accessed
     db 0b1_1_0_0_0000 | (memory_limit >> 16) & 0xf ; 4K_32bit_not 64bit_available to OS_segment limit 16~19
     db (memory_base >> 24) & 0xff ; base address 24~31
