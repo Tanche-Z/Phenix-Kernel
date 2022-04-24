@@ -10,25 +10,6 @@ mov ds, ax
 mov es, ax
 mov ss, ax
 mov sp, 0x7c00
-
-; 0x800 is the ram of text display
-; mov ax, 0xb800
-; mov ds, ax
-; mov byte [0],'H'
-; mov byte [2],'e'
-; mov byte [4],'l'
-; mov byte [6],'l'
-; mov byte [8],'o'
-; mov byte [10],' '
-; mov byte [12],'W'
-; mov byte [14],'o'
-; mov byte [16],'r'
-; mov byte [18],'l'
-; mov byte [20],'d'
-; mov byte [22],'!'
-; mov byte [24],'!'
-; mov byte [26],'!'
-
 mov si, booting
 call print
 
@@ -36,7 +17,6 @@ mov edi, 0x1000; read target memory
 mov ecx, 2; start sector
 mov bl, 4; sector count
 call read_disk
-
 ; xchg bx, bx ; bochs magic break
 
 cmp word [0x1000], 0x55aa
@@ -48,11 +28,9 @@ jmp 0:0x1002
 ; mov ecx, 1; start sector
 ; mov bl, 1; sector count
 ; call write_disk
-
 ; xchg bx, bx ; bochs magic break
 
-; block
-jmp $
+jmp $ ; block
 
 
 read_disk:
