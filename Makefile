@@ -1,8 +1,21 @@
 BUILD:=./build
-SRC=.
-BOCHS_CONFIG=./examples/bochs_config
+SRC:=.
+BOCHS_CONFIG:=./examples/bochs_config
 
-ENTRYPOINT=0X10000
+ENTRYPOINT:=0X10000
+
+CFLAGS:= -m32
+CFLAGS+= -fno-builtin # no built-in function in gcc
+CFLAGS+= -fno-pic # no position independent code
+CFLAGS+= -fno-pie # no position independent excutable
+CFLAGS+= -fno-stack-protector # no stack protector
+CFLAGS+= -nostdinc # no standard header
+CFLAGS+= -nostdlib # no standard library
+CFLAGS:=$(strip ${CFLAGS})
+
+DEBUG:= -g
+
+INCLUDE:= -I $(SRC)/include/
 
 $(BUILD)/boot/%.bin: $(SRC)/boot/%.asm
 	$(shell mkdir -p $(dir $@))
@@ -12,7 +25,11 @@ $(BUILD)/kernel/%.o: $(SRC)/kernel/%.asm
 	$(shell mkdir -p $(dir $@))
 	nasm -f elf32 $< -o $@
 
-$(BUILD)/kernel.bin: $(BUILD)/kernel/start.o
+$(BUILD)/kernel/%.o: $(SRC)/kernel/%.c
+	$(shell mkdir -p $(dir $@))
+	gcc $(CFLAGS) $(DEBUG) $(INCLUDE) -c $< -o $@
+
+$(BUILD)/kernel.bin: $(BUILD)/kernel/start.o $(BUILD)/kernel/main.o
 	$(shell mkdir -p $(dir $@))
 	ld -m elf_i386 -static $^ -o $@ -Ttext $(ENTRYPOINT)
 
