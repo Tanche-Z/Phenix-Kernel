@@ -61,16 +61,17 @@ usb: $(BUILD)/boot/boot.bin /dev/sda
 .PHONY: clean
 clean:
 	rm -rf $(BUILD)
+	rm $(SRC)/bochsrc
 
 # Windows win32 gui debug
 .PHONY: image
 image: $(BUILD)/master.img
-	cp $(BOCHS_CONFIG)/win32_guidebug/bochsrc $(BUILD)
+	cp $(BOCHS_CONFIG)/win32_guidebug/bochsrc $(SRC)
 
 # Linux x11 gui debug
 .PHONY: bochs
 bochs: $(BUILD)/master.img
-	cp $(BOCHS_CONFIG)/linux_x_guidebug/bochsrc $(BUILD)
+	cp $(BOCHS_CONFIG)/linux_x_guidebug/bochsrc $(SRC)
 	bochs -q
 #	bochs-debugger -q # When debug in Fedora Linux
 
