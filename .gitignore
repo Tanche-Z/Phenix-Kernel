@@ -5,5 +5,9 @@
 *.out
 *.o
 *.so
+*.zst
+*.gz
+*.map
+
 build
-./bochsrc
+bochsrc

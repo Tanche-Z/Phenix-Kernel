@@ -1,7 +1,7 @@
 BUILD:=./build
 SRC:=.
-BOCHS_CONFIG:=./test/bochs_config
 TEST=./test
+BOCHS_CONFIG:=$(TEST)/bochs/config
 
 ENTRYPOINT:=0X10000
 
@@ -73,8 +73,12 @@ image: $(BUILD)/master.img
 # Linux x11 gui debug
 .PHONY: bochs
 bochs: $(BUILD)/master.img
-	cp $(BOCHS_CONFIG)/linux_x_guidebug/bochsrc $(SRC)
-	bochs -q
-#	bochs-debugger -q # When debug in Fedora Linux
+	bochs -q -f $(BOCHS_CONFIG)/linux_x_guidebug/bochsrc
+#	bochs-debugger -f $(BOCHS_CONFIG)/linux_x_guidebug/bochsrc # When debug in Fedora Linux
+
+# Linux x11 gdb
+.PHONY: bochsg
+bochsg: $(BUILD)/master.img
+	bochs-gdb -q -f $(BOCHS_CONFIG)/linux_x_guidebug/bochsrc_gdb
 
 test: $(BUILD)/master.img
