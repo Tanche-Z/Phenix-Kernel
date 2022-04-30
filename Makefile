@@ -1,6 +1,7 @@
 BUILD:=./build
 SRC:=.
-BOCHS_CONFIG:=./examples/bochs_config
+BOCHS_CONFIG:=./test/bochs_config
+TEST=./test
 
 ENTRYPOINT:=0X10000
 
@@ -62,6 +63,7 @@ usb: $(BUILD)/boot/boot.bin /dev/sda
 clean:
 	rm -rf $(BUILD)
 	rm $(SRC)/bochsrc
+	rm $(TEST)/*.out
 
 # Windows win32 gui debug
 .PHONY: image
