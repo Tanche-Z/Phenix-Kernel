@@ -2,5 +2,7 @@
 *.bin
 *.img
 *.lock
+*.out
+*.o
+*.so
 build
-.vscode

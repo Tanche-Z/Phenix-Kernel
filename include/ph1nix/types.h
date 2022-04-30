@@ -8,7 +8,7 @@
 #define true 1
 #define false 0
 
-#define packed __attribute__((packed)) // for defining special structral body
+#define _packed __attribute__((packed)) // for defining special structral body
 
 typedef unsigned size_t;
 
