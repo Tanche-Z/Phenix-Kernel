@@ -8,6 +8,7 @@
 *.zst
 *.gz
 *.map
+*.vmdk
 
 build
 bochsrc

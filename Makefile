@@ -51,12 +51,12 @@ $(BUILD)/master.img: $(BUILD)/boot/boot.bin \
 	dd if=$(BUILD)/system.bin of=$@ bs=512 count=200 seek=10 conv=notrunc
 
 .PHONY: usb # sample code for write image to USB device
-usb: $(BUILD)/boot/boot.bin /dev/sda
-	sudo dd if=/dev/sda of=$(BUILD)/boot/tmp.bin bs=512 count=1 conv=notrunc
+usb: $(BUILD)/master.img /dev/sda
+	sudo dd if=/dev/sda of=$(BUILD)/boot/tmp.bin bs=512 count=1000 conv=notrunc
 	cp $(BUILD)/boot/tmp.bin $(BUILD)/boot/usb.bin
 	sudo rm $(BUILD)/boot/tmp.bin
-	dd if=$(BUILD)/boot/boot.bin of=$(BUILD)/boot/usb.bin bs=446 count=1 conv=notrunc
-	sudo dd if=$(BUILD)/boot/usb.bin of=/dev/sda bs=512 count=1 conv=notrunc
+	dd if=$(BUILD)/master.img of=$(BUILD)/boot/usb.bin bs=512 count=1000 conv=notrunc
+	sudo dd if=$(BUILD)/boot/usb.bin of=/dev/sda bs=512 count=1000 conv=notrunc
 	rm $(BUILD)/boot/usb.bin
 
 .PHONY: clean
@@ -77,8 +77,27 @@ bochs: $(BUILD)/master.img
 #	bochs-debugger -f $(BOCHS_CONFIG)/linux_x_guidebug/bochsrc # When debug in Fedora Linux
 
 # Linux x11 gdb
-.PHONY: bochsg
-bochsg: $(BUILD)/master.img
+.PHONY: bochs_gdb
+bochs_gdb: $(BUILD)/master.img
 	bochs-gdb -q -f $(BOCHS_CONFIG)/linux_x_guidebug/bochsrc_gdb
 
-test: $(BUILD)/master.img
+.PHONY: qemu
+qemu: $(BUILD)/master.img
+	qemu-system-i386 \
+	-m 32M \
+	-boot c \
+	-hda $<
+
+.PHONY: qemu_gdb
+qemu_gdb: $(BUILD)/master.img
+	qemu-system-i386 \
+	-s -S \
+	-m 32M \
+	-boot c \
+	-hda $<
+
+$(BUILD)/master.vmdk: $(BUILD)/master.img
+	qemu-img convert -pO vmdk $< $@
+
+.PHONY: vmdk
+vmdk: $(BUILD)/master.vmdk
