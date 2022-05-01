@@ -70,13 +70,11 @@ clean:
 image: $(BUILD)/master.img
 	cp $(BOCHS_CONFIG)/win32_guidebug/bochsrc $(SRC)
 
-# Linux x11 gui debug
 .PHONY: bochs
 bochs: $(BUILD)/master.img
 	bochs -q -f $(BOCHS_CONFIG)/linux_x_guidebug/bochsrc
 #	bochs-debugger -f $(BOCHS_CONFIG)/linux_x_guidebug/bochsrc # When debug in Fedora Linux
 
-# Linux x11 gdb
 .PHONY: bochs_gdb
 bochs_gdb: $(BUILD)/master.img
 	bochs-gdb -q -f $(BOCHS_CONFIG)/linux_x_guidebug/bochsrc_gdb
