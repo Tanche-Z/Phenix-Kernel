@@ -2,11 +2,38 @@
 
 The kernel of ph1nix OS
 
-This project was inspired by following projects
+### To Do:
+
+- [ ] Basic Function of Operating System.
+    
+    - [x] Real mode
+    - [ ] Protect mode
+    - [ ] Display driver
+    - [ ] Process management
+    - [ ] Memory management
+    - [ ] File system
+
+- [ ] Posix and TCP/IP
+
+- [ ] 32 Bits to 64 Bits
+
+- [ ] BIOS (Legacy) to UEFI
+
+- [ ] GUI
+
+- [ ] Page system
+
+- [ ] Hardware Driver Subsystem
+
+- [ ] Developing APIs
+
+- [ ] Mass migration of software (sperate repo)
+
+### This project was inspired by following
+
+projects:
 
 - Onix: <https://github.com/StevenBaby/onix>
-
-References
 
 Books:
 
