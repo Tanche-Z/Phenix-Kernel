@@ -6,6 +6,7 @@ CFLAGS:= -m32
 # CFLAGS+= -fno-pic # no position independent code
 # CFLAGS+= -fno-pie # no position independent excutable
 # CFLAGS+= -fno-stack-protector # no stack protector
+CFLAGS+= -fno-asynchronous-unwind-tables # no CFI (Call Frame Information)
 # CFLAGS+= -nostdinc # no standard header
 # CFLAGS+= -nostdlib # no standard library
 CFLAGS:=$(strip ${CFLAGS})

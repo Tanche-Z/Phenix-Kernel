@@ -1,11 +1,17 @@
 # ph1nix
 
-The kernel of ph1nix OS.
+The kernel of ph1nix OS
 
-This project was inspired by following projects:
+This project was inspired by following projects
 
-1. Onix: <https://github.com/StevenBaby/onix>
+- Onix: <https://github.com/StevenBaby/onix>
 
-References:
+References
 
-1. OSDev.org: <https://wiki.osdev.org/>
+Books:
+
+- 《操作系统真象还原》——郑钢
+
+Documents:
+
+- OSDev.org: <https://wiki.osdev.org/>
