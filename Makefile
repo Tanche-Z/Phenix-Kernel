@@ -1,6 +1,7 @@
-BUILD:=./build
 SRC:=.
 TEST=./test
+BUILD:=./build
+TEST_BUILD:=$(TEST)/build
 BOCHS_CONFIG:=$(TEST)/bochs/config
 
 ENTRYPOINT:=0X10000
@@ -61,9 +62,8 @@ usb: $(BUILD)/master.img /dev/sda
 
 .PHONY: clean
 clean:
-	rm -rf $(BUILD)
-	rm $(SRC)/bochsrc
-	rm $(TEST)/*.out
+	rm -rf $(BUILD); \
+	rm $(SRC)/bochsrc; 
 
 # Windows win32 gui debug
 .PHONY: image

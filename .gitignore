@@ -11,4 +11,5 @@
 *.vmdk
 
 build
+./test/build
 bochsrc
