@@ -9,7 +9,7 @@
 *.gz
 *.map
 *.vmdk
-./build/
-./test/build
+./build/**
+./test/build/**
 ./bochsrc
 ./bochsrc_gdb

@@ -63,7 +63,7 @@ usb: $(BUILD)/master.img /dev/sda
 .PHONY: clean
 clean:
 	rm -rf $(BUILD); \
-	rm $(SRC)/bochsrc; 
+	rm $(SRC)/bochsrc*; 
 
 # Windows win32 gui-debug (Linux as remote compiling machine, Windows machine as Local debugging machine)
 .PHONY: image
