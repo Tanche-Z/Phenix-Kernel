@@ -12,5 +12,4 @@
 *.vmdk
 build
 test/build
-bochsrc
-bochsrc_gdb
+bochsrc*
