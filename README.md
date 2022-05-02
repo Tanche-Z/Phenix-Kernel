@@ -7,17 +7,18 @@ The kernel of ph1nix OS
 - [ ] Basic Function of Operating System.
     
     - [x] Real mode
-    - [ ] Protect mode
+    - [x] Protect mode
     - [ ] Display driver
     - [ ] Process management
     - [ ] Memory management
     - [ ] File system
+    - [ ] buit-in shell
 
 - [ ] Posix and TCP/IP
 
 - [ ] 32 Bits to 64 Bits
 
-- [ ] BIOS (Legacy) to UEFI
+- [ ] BIOS (Legacy) to UEFI and grub2
 
 - [ ] GUI
 

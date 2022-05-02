@@ -10,6 +10,7 @@
 *.map
 *.vmdk
 
-build
+./build/
 ./test/build
-bochsrc
+./bochsrc
+./bochsrc_gdb
