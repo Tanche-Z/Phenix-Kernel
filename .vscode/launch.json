@@ -2,7 +2,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "ph1nix - Build and Debug kernel (Linux Remote)",
+            "name": "ph1nix kernel gdb",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/build/kernel.bin",
@@ -12,7 +12,7 @@
             "environment": [],
             "externalConsole": false,
             "MIMode": "gdb",
-            "miDebuggerServerAddress": "localhost:1234", // default gdb port for qemu and was set in bochsrc_gdb file
+            "miDebuggerServerAddress": "localhost:1234", // default gdb port for qemu/bochs_gdb and was set in bochsrc_gdb file
             "setupCommands": [
                 {
                     "description": "Enable pretty-printing for gdb",
@@ -27,38 +27,25 @@
             ],
             "miDebuggerPath": "/usr/bin/gdb"
         },
-        // For local debugging in Windows using Samba (May need re-compile bochs for gdb supporting)
         // {
-        //     "name": "ph1nix - Build and Debug kernel (Windows SMB)",
-        //     "type": "cppdbg",
+        //     "name": "ph1nix kernel lldb", // LLDB debugging require CodeLLDB extention which can find in VScode Marketplace
+        //     "type": "lldb",
         //     "request": "launch",
         //     "program": "${workspaceFolder}/build/kernel.bin",
         //     "args": [],
-        //     "stopAtEntry": false,
+        //     //"stopAtEntry": false,
         //     "cwd": "${fileDirname}",
-        //     "environment": [],
-        //     "externalConsole": false,
-        //     "MIMode": "gdb",
-        //     "miDebuggerServerAddress": "localhost:1234", // default gdb port for qemu and was set in bochsrc_gdb file
-        //     "setupCommands": [
-        //         {
-        //             "description": "Enable pretty-printing for gdb",
-        //             "text": "-enable-pretty-printing",
-        //             "ignoreFailures": true
-        //         },
-        //         {
-        //             "description":  "Set Disassembly Flavor to Intel",
-        //             "text": "-gdb-set disassembly-flavor intel",
-        //             "ignoreFailures": true
-        //         }
-        //     ],
-        //     "miDebuggerPath": "C:\\msys64\\usr\\bin\\gdb.exe"
+        //     //"environment": [],
+        //     //"externalConsole": false,
+        //     //"MIMode": "lldb",
+        //     //"miDebuggerServerAddress": "localhost:1234", // default gdb port for qemu and was set in bochsrc_gdb file
+        //     //"miDebuggerPath": "/usr/bin/lldb"
         // },
         {
-            "name": "(gdb) Launch",
+            "name": "test gdb_c",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${fileDirname}/${fileBasenameNoExtension}.out",
+            "program": "${workspaceFolder}/build/test_debug/${fileBasenameNoExtension}.out",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",
@@ -79,7 +66,55 @@
             ],
             "preLaunchTask": "C/C++: gcc build active file",
             "miDebuggerPath": "/usr/bin/gdb"
-        }
+        },
+        {
+            "name": "test gdb_nasm",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/test_debug/${fileBasenameNoExtension}.out",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${fileDirname}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description":  "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ],
+            "preLaunchTask": "nasm: gcc build active file",
+            "miDebuggerPath": "/usr/bin/gdb"
+        },
+        {
+            "name": "test lldb_c", // LLDB debugging require CodeLLDB extention which can find in VScode Marketplace
+            "type": "lldb",
+            "request": "launch",
+            "program": "${fileDirname}/${fileBasenameNoExtension}.out",
+            "args": [],
+            "cwd": "${fileDirname}",
+            // "MIMode": "lldb",
+            "preLaunchTask": "C/C++: clang build active file",
+            // "miDebuggerPath": "/usr/bin/lldb"
+        },
+        {
+            "name": "test lldb_nasm", // LLDB debugging require CodeLLDB extention which can find in VScode Marketplace
+            "type": "lldb",
+            "request": "launch",
+            "program": "${fileDirname}/${fileBasenameNoExtension}.out",
+            "args": [],
+            "cwd": "${fileDirname}",
+            // "MIMode": "lldb",
+            "preLaunchTask": "nasm: clang build active file",
+            // "miDebuggerPath": "/usr/bin/lldb"
+        },
 
     ]
 }
