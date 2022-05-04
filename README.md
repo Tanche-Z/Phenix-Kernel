@@ -8,6 +8,8 @@ The kernel of ph1nix OS
     
     - [x] Real mode
     - [x] Protect mode
+    - [x] IO
+    - [ ] String
     - [ ] Display driver
     - [ ] Process management
     - [ ] Memory management
