@@ -42,6 +42,10 @@ Books:
 
 - 《操作系统真象还原》——郑钢
 
-Documents:
+Webs & Documents:
 
 - OSDev.org: <https://wiki.osdev.org/>
+
+- cppreference.com <https://en.cppreference.com/w/>
+
+- OSDever.net <http://www.osdever.net/>
