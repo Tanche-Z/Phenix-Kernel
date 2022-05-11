@@ -1,5 +1,5 @@
-#ifndef PH1NIX_IO_H
-#define PH1NIX_IO_H
+#ifndef _PH1NIX_IO_H
+#define _PH1NIX_IO_H
 
 #include <ph1nix/types.h>
 
