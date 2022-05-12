@@ -22,10 +22,10 @@
   `/:`             .-/+oossyysso+/:-`      :o/`   
 */
 
-#ifndef PH1NIX_H
-#define PH1NIX_H
+#ifndef _PH1NIX_H
+#define _PH1NIX_H
 
-#define PH1NIX_MAGIC 20220426
-void kernel_init(); //initialize the kernel
+#define _PH1NIX_MAGIC 20220426
+void _kernel_init(); //initialize the kernel
 
 #endif 

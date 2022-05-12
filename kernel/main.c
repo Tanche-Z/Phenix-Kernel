@@ -8,7 +8,7 @@
 #define CRT_CURSOR_H 0xe // the position of cursor (high)
 #define CRT_CURSOR_L 0xf // the position of cursor (low)
 
-void kernel_init()
+void _kernel_init()
 {
     outb(CRT_ADDR_REG, CRT_CURSOR_H);
     u16 pos = inb(CRT_DATA_REG) << 8;

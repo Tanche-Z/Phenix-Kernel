@@ -1,10 +1,12 @@
-#ifndef PH1NIX_TYPES_H
-#define PH1NIX_TYPES_H
+#ifndef _PH1NIX_TYPES_H
+#define _PH1NIX_TYPES_H
 
-#define EOF // End of file
-#define NULL 0 // Empty pointer
+#define _EOF // End of file
+#define _EOS '\0' // End of string
+#define _NULL ((void *)0) // Empty pointer
 
-#define bool _BOOL
+
+#define bool _BOOL;
 #define true 1
 #define false 0
 

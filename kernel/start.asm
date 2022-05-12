@@ -1,8 +1,8 @@
 [bits 32]
 
-extern kernel_init
+extern _kernel_init
 
 global _start
 _start:
-    call kernel_init
+    call _kernel_init
     jmp $
