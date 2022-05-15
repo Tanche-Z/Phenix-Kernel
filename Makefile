@@ -109,3 +109,9 @@ $(BUILD)/master.vmdk: $(BUILD)/master.img
 
 .PHONY: vmdk
 vmdk: $(BUILD)/master.vmdk
+
+$(BUILD)/master.vdi: $(BUILD)/master.img
+	qemu-img convert -pO vdi $< $@
+
+.PHONY: vdi
+vdi: $(BUILD)/master.vdi
