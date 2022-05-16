@@ -25,7 +25,8 @@
                     "ignoreFailures": true
                 }
             ],
-            "miDebuggerPath": "/usr/bin/gdb"
+            // "miDebuggerPath": "/usr/bin/gdb" // for x86_64 env debugging
+            "miDebuggerPath": "/opt/homebrew/Cellar/x86_64-elf-gdb/11.2/bin/x86_64-elf-gdb" // for m1 Mac (arch64) env debugging
         },
         // {
         //     "name": "ph1nix kernel lldb", // LLDB debugging require CodeLLDB extention which can find in VScode Marketplace
