@@ -115,3 +115,10 @@ $(BUILD)/master.vdi: $(BUILD)/master.img
 
 .PHONY: vdi
 vdi: $(BUILD)/master.vdi
+
+# should manually set path for IDE disk of usb.vmdk for usb test in virtualbox
+.PHONY: vbox_usb_test
+vbox_usb_test: usb
+	sudo rm ${HOME}/VirtualBox\ VMs/ph1nix_usb/usb.vmdk; \
+	sudo vboxmanage internalcommands createrawvmdk -filename ${HOME}/VirtualBox\ VMs/ph1nix_usb/usb.vmdk -rawdisk /dev/sda; \
+	sudo chmod 777 ${HOME}/VirtualBox\ VMs/ph1nix_usb/usb.vmdk
