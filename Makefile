@@ -123,21 +123,22 @@ qemu_gdb: $(BUILD)/master.img
 	-boot c \
 	-hda $<
 
+# generate vmware disk image
 $(BUILD)/master.vmdk: $(BUILD)/master.img
 	qemu-img convert -pO vmdk $< $@
-
 .PHONY: vmdk
 vmdk: $(BUILD)/master.vmdk
 
-$(BUILD)/master.vdi: $(BUILD)/master.img
-	qemu-img convert -pO vdi $< $@
+# # generate virtualbox disk image
+# # the virtualbox always check the uuid and new image wouldn't match, thus depreciated
+# $(BUILD)/master.vdi: $(BUILD)/master.img
+# 	qemu-img convert -pO vdi $< $@
+# .PHONY: vdi
+# vdi: $(BUILD)/master.vdi
 
-.PHONY: vdi
-vdi: $(BUILD)/master.vdi
-
-# should manually set path for IDE disk of usb.vmdk for usb test in virtualbox
-.PHONY: vbox_usb_test
-vbox_usb_test: usb
-	sudo rm ${HOME}/VirtualBox\ VMs/ph1nix_usb/usb.vmdk; \
-	sudo vboxmanage internalcommands createrawvmdk -filename ${HOME}/VirtualBox\ VMs/ph1nix_usb/usb.vmdk -rawdisk /dev/sda; \
-	sudo chmod 777 ${HOME}/VirtualBox\ VMs/ph1nix_usb/usb.vmdk
+# # for testing image in usb drive in virtualbox before going physic machine test
+# # should manually set path for IDE disk of usb.vmdk for usb test in virtualbox
+# .PHONY: vbox_usb_test
+# vbox_usb_test: usb
+# 	sudo vboxmanage internalcommands createrawvmdk -filename $(BUILD)/usb.vmdk -rawdisk /dev/sda; \
+# 	sudo chown kali:kali $(BUILD)/usb.vmdk
