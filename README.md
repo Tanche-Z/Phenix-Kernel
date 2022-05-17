@@ -9,8 +9,8 @@ The kernel of ph1nix OS
     - [x] Real mode
     - [x] Protect mode
     - [x] IO
-    - [ ] String
-    - [ ] Display driver
+    - [x] String
+    - [ ] Display driver (simplified)
     - [ ] Process management
     - [ ] Memory management
     - [ ] File system
@@ -27,6 +27,8 @@ The kernel of ph1nix OS
 - [ ] Page system
 
 - [ ] Hardware Driver Subsystem
+  - [ ] Display driver (nvidia kernel space)
+  - [ ] alsa
 
 - [ ] Developing APIs
 
