@@ -5,8 +5,6 @@ dw 0x55aa ;magic for judgement
 mov si, loading
 call print
 
-; xchg bx, bx ;break point
-
 detect_memory:
     ;set ebx to 0
     xor ebx, ebx

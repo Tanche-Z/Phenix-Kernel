@@ -1,6 +1,6 @@
 #include <ph1nix/string.h>
 
-char *strcp(char *dest, const char *src)
+char *strcpy(char *dest, const char *src)
 {
     char *ptr = dest;
     while (true)
@@ -40,7 +40,7 @@ size_t strlen(const char *str)
 
 int strcmp(const char *lhs, const char *rhs)
 {
-    while (*lhs == *rhs && lhs != _EOS && rhs !=_EOS)
+    while (*lhs == *rhs && *lhs != _EOS && *rhs !=_EOS)
     {
         lhs++;
         rhs++;

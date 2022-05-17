@@ -23,35 +23,39 @@ $(BUILD)/boot/%.bin: $(SRC)/boot/%.asm
 	$(shell mkdir -p $(dir $@))
 	nasm -f bin $< -o $@
 
-$(BUILD)/kernel/%.o: $(SRC)/kernel/%.asm
+$(BUILD)/%.o: $(SRC)/%.asm
 	$(shell mkdir -p $(dir $@))
 	nasm -f elf32 -gdwarf $< -o $@
 
 # for x86 env build
-#$(BUILD)/kernel/%.o: $(SRC)/kernel/%.c
-#	$(shell mkdir -p $(dir $@))
-#	gcc $(CFLAGS) $(DEBUG) $(INCLUDE) -c $< -o $@
+$(BUILD)/%.o: $(SRC)/%.c
+	$(shell mkdir -p $(dir $@))
+	gcc $(CFLAGS) $(DEBUG) $(INCLUDE) -c $< -o $@
 
 # for x86 env build
-#$(BUILD)/kernel.bin: \
-	$(BUILD)/kernel/start.o \
-	$(BUILD)/kernel/main.o \
-	$(BUILD)/kernel/io.o
-#	$(shell mkdir -p $(dir $@))
-#	ld -m elf_i386 -static $^ -o $@ -Ttext $(ENTRYPOINT)
-
-# for m1 Mac (arm64) build (install by brew: x86_64-elf-binutils x86_64-elf-gcc x86_64-elf-gdb)
-$(BUILD)/kernel/%.o: $(SRC)/kernel/%.c
-	$(shell mkdir -p $(dir $@))
-	/opt/homebrew/Cellar/x86_64-elf-gcc/11.3.0/bin/x86_64-elf-gcc $(CFLAGS) $(DEBUG) $(INCLUDE) -c $< -o $@
-
-# for m1 Mac (arm64) build
 $(BUILD)/kernel.bin: \
 	$(BUILD)/kernel/start.o \
 	$(BUILD)/kernel/main.o \
-	$(BUILD)/kernel/io.o
+	$(BUILD)/kernel/io.o \
+	$(BUILD)/lib/string.o
+	
 	$(shell mkdir -p $(dir $@))
-	/opt/homebrew/Cellar/x86_64-elf-binutils/2.38/bin/x86_64-elf-ld -m elf_i386 -static $^ -o $@ -Ttext $(ENTRYPOINT)
+	ld -m elf_i386 -static $^ -o $@ -Ttext $(ENTRYPOINT)
+
+# # for m1 Mac (arm64) build (install by brew: x86_64-elf-binutils x86_64-elf-gcc x86_64-elf-gdb)
+# $(BUILD)/kernel/%.o: $(SRC)/kernel/%.c
+# 	$(shell mkdir -p $(dir $@))
+# 	/opt/homebrew/Cellar/x86_64-elf-gcc/11.3.0/bin/x86_64-elf-gcc $(CFLAGS) $(DEBUG) $(INCLUDE) -c $< -o $@
+
+# # for m1 Mac (arm64) build
+# $(BUILD)/kernel.bin: \
+# 	$(BUILD)/kernel/start.o \
+# 	$(BUILD)/kernel/main.o \
+# 	$(BUILD)/kernel/io.o \
+#	$(BUILD)/lib/string.o
+
+# 	$(shell mkdir -p $(dir $@))
+# 	/opt/homebrew/Cellar/x86_64-elf-binutils/2.38/bin/x86_64-elf-ld -m elf_i386 -static $^ -o $@ -Ttext $(ENTRYPOINT)
 
 $(BUILD)/system.bin: $(BUILD)/kernel.bin
 	objcopy -O binary $< $@

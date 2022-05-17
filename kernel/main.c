@@ -23,8 +23,23 @@ void _kernel_init()
     // outb(CRT_ADDR_REG, CRT_CURSOR_L);
     // outb(CRT_DATA_REG, 123);
 
-int res;
-res = 
+    int res;
+    res = strcmp(buf, message);
+    strcpy(buf, message);
+    res = strcmp(buf, message);
+    strcat(buf, message);
+    res = strcmp(buf, message);
+    res = strlen(message);
+    res = sizeof(message);
+
+    char *ptr = strchr(message, '^');
+    ptr = strrchr(message, '^');
+
+    memset(buf, 0, sizeof(buf));
+    res = memcmp(buf, message,sizeof(message));
+    memcpy(buf, message,sizeof(message));
+    res = memcmp(buf, message,sizeof(message));
+    ptr = memchr(buf, '^', sizeof(message));
 
     return;
 }

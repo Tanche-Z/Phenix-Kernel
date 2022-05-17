@@ -12,7 +12,7 @@
 
 #define _packed __attribute__((packed)) // for defining special structral body
 
-typedef unsigned size_t;
+typedef unsigned int size_t;
 
 typedef char int8;
 typedef short int16;
