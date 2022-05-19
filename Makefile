@@ -4,7 +4,16 @@ BUILD:=./build
 TEST_BUILD:=$(TEST)/build
 BOCHS_CONFIG:=$(TEST)/bochs/config
 
-ENTRYPOINT:=0X10000
+# # x86_64 dev env (in Linux)
+# CC=/usr/bin/gcc
+# AS=/usr/bin/nasm
+# LD=/usr/bin/ld
+
+# aarch64 dev env (in MacOS)
+# for m1 Mac (arm64) build (install by brew: x86_64-elf-binutils x86_64-elf-gcc x86_64-elf-gdb)
+CC=/opt/homebrew/bin/x86_64-elf-gcc
+AS=/opt/homebrew/bin/nasm
+LD=/opt/homebrew/bin/x86_64-elf-ld
 
 CFLAGS:= -m32
 CFLAGS+= -fno-builtin # no built-in function in gcc
@@ -15,47 +24,30 @@ CFLAGS+= -nostdinc # no standard header
 CFLAGS+= -nostdlib # no standard library
 CFLAGS:=$(strip ${CFLAGS})
 
+ENTRYPOINT:=0X10000
 DEBUG:= -g
-
 INCLUDE:= -I $(SRC)/include/
 
 $(BUILD)/boot/%.bin: $(SRC)/boot/%.asm
 	$(shell mkdir -p $(dir $@))
-	nasm -f bin $< -o $@
+	$(AS) -f bin $< -o $@
 
 $(BUILD)/%.o: $(SRC)/%.asm
 	$(shell mkdir -p $(dir $@))
-	nasm -f elf32 -gdwarf $< -o $@
+	$(AS) -f elf32 -gdwarf $< -o $@
 
-# for x86 env build
 $(BUILD)/%.o: $(SRC)/%.c
 	$(shell mkdir -p $(dir $@))
-	gcc $(CFLAGS) $(DEBUG) $(INCLUDE) -c $< -o $@
+	$(CC) $(CFLAGS) $(DEBUG) $(INCLUDE) -c $< -o $@
 
-# for x86 env build
 $(BUILD)/kernel.bin: \
 	$(BUILD)/kernel/start.o \
 	$(BUILD)/kernel/main.o \
 	$(BUILD)/kernel/io.o \
 	$(BUILD)/lib/string.o
-	
+
 	$(shell mkdir -p $(dir $@))
-	ld -m elf_i386 -static $^ -o $@ -Ttext $(ENTRYPOINT)
-
-# # for m1 Mac (arm64) build (install by brew: x86_64-elf-binutils x86_64-elf-gcc x86_64-elf-gdb)
-# $(BUILD)/kernel/%.o: $(SRC)/kernel/%.c
-# 	$(shell mkdir -p $(dir $@))
-# 	/opt/homebrew/Cellar/x86_64-elf-gcc/11.3.0/bin/x86_64-elf-gcc $(CFLAGS) $(DEBUG) $(INCLUDE) -c $< -o $@
-
-# # for m1 Mac (arm64) build
-# $(BUILD)/kernel.bin: \
-# 	$(BUILD)/kernel/start.o \
-# 	$(BUILD)/kernel/main.o \
-# 	$(BUILD)/kernel/io.o \
-#	$(BUILD)/lib/string.o
-
-# 	$(shell mkdir -p $(dir $@))
-# 	/opt/homebrew/Cellar/x86_64-elf-binutils/2.38/bin/x86_64-elf-ld -m elf_i386 -static $^ -o $@ -Ttext $(ENTRYPOINT)
+	$(LD) -m elf_i386 -static $^ -o $@ -Ttext $(ENTRYPOINT)
 
 $(BUILD)/system.bin: $(BUILD)/kernel.bin
 	objcopy -O binary $< $@
