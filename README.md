@@ -14,23 +14,27 @@ The kernel of ph1nix OS
     - [ ] Process management
     - [ ] Memory management
     - [ ] File system
+    - [ ] Page system
     - [ ] buit-in shell
 
-- [ ] Posix and TCP/IP
+- [ ] Posix
 
-- [ ] 32 Bits to 64 Bits
+- [ ] TCP/IP
+
+- [ ] i386 to x86_64
+
+- [ ] Port to ARMV8 (aarch64)
 
 - [ ] BIOS (Legacy) to UEFI and support grub2
 
-- [ ] GUI (C++) (Dragon DE)
-
-- [ ] Page system
-
 - [ ] Hardware Driver Subsystem
+
   - [ ] Display driver (nvidia kernel space)
   - [ ] alsa
 
-- [ ] Port to ARM, RISC-V
+- [ ] Port to RISC-V
+
+- [ ] GUI (C++) (Dragon DE)
 
 - [ ] Developing APIs
 
