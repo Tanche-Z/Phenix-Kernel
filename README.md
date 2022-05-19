@@ -4,7 +4,7 @@ The kernel of ph1nix OS
 
 ### To Do:
 
-- [ ] Basic Function of Operating System.
+- [ ] Basic Function of System Kernel:
     
     - [x] Real mode
     - [x] Protect mode
@@ -24,8 +24,11 @@ The kernel of ph1nix OS
 - [ ] i386 to x86_64
 
 - [ ] Port to ARMV8 (aarch64)
+  
+  - [ ] qemu-system-aarch64
+  - [ ] support for Raspberry Pi 4B (ARMV8)
 
-- [ ] BIOS (Legacy) to UEFI and support grub2
+- [ ] BIOS (Legacy) to UEFI + support grub2
 
 - [ ] Hardware Driver Subsystem
 
