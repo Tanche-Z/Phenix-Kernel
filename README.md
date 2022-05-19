@@ -20,15 +20,17 @@ The kernel of ph1nix OS
 
 - [ ] 32 Bits to 64 Bits
 
-- [ ] BIOS (Legacy) to UEFI and grub2
+- [ ] BIOS (Legacy) to UEFI and support grub2
 
-- [ ] GUI
+- [ ] GUI (C++) (Dragon DE)
 
 - [ ] Page system
 
 - [ ] Hardware Driver Subsystem
   - [ ] Display driver (nvidia kernel space)
   - [ ] alsa
+
+- [ ] Port to ARM, RISC-V
 
 - [ ] Developing APIs
 
