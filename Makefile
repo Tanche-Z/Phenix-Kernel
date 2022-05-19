@@ -4,16 +4,30 @@ BUILD:=./build
 TEST_BUILD:=$(TEST)/build
 BOCHS_CONFIG:=$(TEST)/bochs/config
 
-# # x86_64 dev env (in Linux)
+TARGET:=x86_64-elf-
+#TARGET:=aarch64-elf-
+
+# set toolchains: Linux/WSL2, MacOS
+
+# # Linux/WSL2 (x86_64 host)(i386/x86_64 target) or (NOT SUPPORTED yet)(aarch64 host)(aarch64 target)
 # CC=/usr/bin/gcc
 # AS=/usr/bin/nasm
 # LD=/usr/bin/ld
 
-# aarch64 dev env (in MacOS)
-# for m1 Mac (arm64) build (install by brew: x86_64-elf-binutils x86_64-elf-gcc x86_64-elf-gdb)
-CC=/opt/homebrew/bin/x86_64-elf-gcc
+# # Linux/WSL2 cross (aarch64 host)(i386/x86_64 target)
+# CC=/usr/bin/x86_64-linux-gnu-gcc
+# AS=/usr/bin/nasm
+# LD=/usr/bin/x86_64-linux-gnu-ld
+
+# # Linux/WSL2 cross (x86_64 host)(aarch64 target)(NOT SUPPORTED yet)
+# CC=/usr/bin/aarch64-linux-gnu-gcc
+# AS=/usr/bin/aarch64-linux-gnu-as
+# LD=/usr/bin/aarch64-linux-gnu-ld
+
+# MacOS (Intel(x86_64)/Apple Silicon(aarch64) host)
+CC=/opt/homebrew/bin/$(TARGET)gcc
 AS=/opt/homebrew/bin/nasm
-LD=/opt/homebrew/bin/x86_64-elf-ld
+LD=/opt/homebrew/bin/$(TARGET)ld
 
 CFLAGS:= -m32
 CFLAGS+= -fno-builtin # no built-in function in gcc
