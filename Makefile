@@ -4,10 +4,8 @@ BUILD:=./build
 TEST_BUILD:=$(TEST)/build
 BOCHS_CONFIG:=$(TEST)/bochs/config
 
-TARGET:=x86_64-elf-
-#TARGET:=aarch64-elf-
-
-# set toolchains: Linux/WSL2, MacOS
+LINUX_TARGET:=x86_64-linux-gnu-
+# LINUX_TARGET:=aarch64-linux-gnu-
 
 # # Linux/WSL2 (x86_64 host)(i386/x86_64 target) or (NOT SUPPORTED yet)(aarch64 host)(aarch64 target)
 # CC=/usr/bin/gcc
@@ -15,19 +13,21 @@ TARGET:=x86_64-elf-
 # LD=/usr/bin/ld
 
 # # Linux/WSL2 cross (aarch64 host)(i386/x86_64 target)
-# CC=/usr/bin/x86_64-linux-gnu-gcc
+# CC=/usr/bin/$(LINUX_TARGET)gcc
 # AS=/usr/bin/nasm
-# LD=/usr/bin/x86_64-linux-gnu-ld
+# LD=/usr/bin/$(LINUX_TARGET)ld
 
 # # Linux/WSL2 cross (x86_64 host)(aarch64 target)(NOT SUPPORTED yet)
-# CC=/usr/bin/aarch64-linux-gnu-gcc
-# AS=/usr/bin/aarch64-linux-gnu-as
-# LD=/usr/bin/aarch64-linux-gnu-ld
+# CC=/usr/bin/$(LINUX_TARGET)gcc
+# AS=/usr/bin/$(LINUX_TARGET)as
+# LD=/usr/bin/$(LINUX_TARGET)ld
 
-# MacOS (Intel(x86_64)/Apple Silicon(aarch64) host)
-CC=/opt/homebrew/bin/$(TARGET)gcc
+# MacOS (Intel(x86_64)/Apple Silicon(aarch64) host)(i386 target)
+MACOS_TARGET:=x86_64-elf-
+# MACOS_TARGET:=aarch64-elf-
+CC=/opt/homebrew/bin/$(MACOS_TARGET)gcc
 AS=/opt/homebrew/bin/nasm
-LD=/opt/homebrew/bin/$(TARGET)ld
+LD=/opt/homebrew/bin/$(MACOS_TARGET)ld
 
 CFLAGS:= -m32
 CFLAGS+= -fno-builtin # no built-in function in gcc
