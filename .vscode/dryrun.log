@@ -1,6 +1,0 @@
-make --dry-run --keep-going --print-directory
-make: Entering directory `/Users/zhy/projects/os/ph1nix'
-ld -m elf_i386 -static build/kernel/start.o build/kernel/main.o build/kernel/io.o build/lib/string.o -o build/kernel.bin -Ttext 0X10000
- 
-make: Leaving directory `/Users/zhy/projects/os/ph1nix'
- 
