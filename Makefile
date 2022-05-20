@@ -4,30 +4,25 @@ BUILD:=./build
 TEST_BUILD:=$(TEST)/build
 BOCHS_CONFIG:=$(TEST)/bochs/config
 
-LINUX_TARGET:=x86_64-linux-gnu-
-# LINUX_TARGET:=aarch64-linux-gnu-
+# comment or uncomment to choose toolchains
 
-# # Linux/WSL2 (x86_64 host)(i386/x86_64 target) or (NOT SUPPORTED yet)(aarch64 host)(aarch64 target)
-# CC=/usr/bin/gcc
-# AS=/usr/bin/nasm
-# LD=/usr/bin/ld
+TARGET:=x86_64
+#TARGET:=aarch64
 
-# # Linux/WSL2 cross (aarch64 host)(i386/x86_64 target)
-# CC=/usr/bin/$(LINUX_TARGET)gcc
-# AS=/usr/bin/nasm
-# LD=/usr/bin/$(LINUX_TARGET)ld
+HOME_BREW_PATH:=/opt/homebrew/bin/
+LINUX_PATH:=/usr/bin/
 
-# # Linux/WSL2 cross (x86_64 host)(aarch64 target)(NOT SUPPORTED yet)
-# CC=/usr/bin/$(LINUX_TARGET)gcc
-# AS=/usr/bin/$(LINUX_TARGET)as
-# LD=/usr/bin/$(LINUX_TARGET)ld
+# for mac host
+HOST:=$(HOME_BREW_PATH)$(TARGET)-elf-
+# for linux host
+#HOST:=$(LINUX)$(TARGET)-linux-gnu-
 
-# MacOS (Intel(x86_64)/Apple Silicon(aarch64) host)(i386 target)
-MACOS_TARGET:=x86_64-elf-
-# MACOS_TARGET:=aarch64-elf-
-CC=/opt/homebrew/bin/$(MACOS_TARGET)gcc
-AS=/opt/homebrew/bin/nasm
-LD=/opt/homebrew/bin/$(MACOS_TARGET)ld
+#AS:=$(LINUX_PATH)nasm # for linux x86 target 
+AS:=$(HOME_BREW_PATH)nasm # for mac x86 target 
+#AS:=$(HOST)as # for arm target
+CC:=$(HOST)gcc
+LD:=$(HOST)ld
+OBJCOPY:=$(HOST)objcopy
 
 CFLAGS:= -m32
 CFLAGS+= -fno-builtin # no built-in function in gcc
@@ -64,7 +59,7 @@ $(BUILD)/kernel.bin: \
 	$(LD) -m elf_i386 -static $^ -o $@ -Ttext $(ENTRYPOINT)
 
 $(BUILD)/system.bin: $(BUILD)/kernel.bin
-	objcopy -O binary $< $@
+	$(OBJCOPY) -O binary $< $@
 
 $(BUILD)/system.map: $(BUILD)/kernel.bin
 	nm $< | sort > $@
@@ -81,11 +76,17 @@ $(BUILD)/master.img: $(BUILD)/boot/boot.bin \
 
 .PHONY: usb # sample code for write image to USB device
 usb: $(BUILD)/master.img /dev/sda
-	sudo dd if=/dev/sda of=$(BUILD)/boot/tmp.bin bs=512 count=1000 conv=notrunc
+	# sudo dd if=/dev/sda of=$(BUILD)/boot/tmp.bin bs=512 count=1000 conv=notrunc
+	# cp $(BUILD)/boot/tmp.bin $(BUILD)/boot/usb.bin
+	# sudo rm $(BUILD)/boot/tmp.bin
+	# dd if=$(BUILD)/master.img of=$(BUILD)/boot/usb.bin bs=512 count=1000 conv=notrunc
+	# sudo dd if=$(BUILD)/boot/usb.bin of=/dev/sda bs=512 count=1000 conv=notrunc
+	# rm $(BUILD)/boot/usb.bin
+	sudo dd if=/dev/sda of=$(BUILD)/boot/tmp.bin bs=512 conv=notrunc
 	cp $(BUILD)/boot/tmp.bin $(BUILD)/boot/usb.bin
 	sudo rm $(BUILD)/boot/tmp.bin
-	dd if=$(BUILD)/master.img of=$(BUILD)/boot/usb.bin bs=512 count=1000 conv=notrunc
-	sudo dd if=$(BUILD)/boot/usb.bin of=/dev/sda bs=512 count=1000 conv=notrunc
+	dd if=$(BUILD)/master.img of=$(BUILD)/boot/usb.bin bs=512 conv=notrunc
+	sudo dd if=$(BUILD)/boot/usb.bin of=/dev/sda bs=512 conv=notrunc
 	rm $(BUILD)/boot/usb.bin
 
 .PHONY: clean

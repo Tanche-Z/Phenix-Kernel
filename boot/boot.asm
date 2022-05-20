@@ -9,7 +9,7 @@ mov ax, 0
 mov ds, ax
 mov es, ax
 mov ss, ax
-mov sp, 0x7c00
+mov sp, 0x7c00 ; MBR Load into this address after find magic number of 0x55, 0xAA
 mov si, booting
 call print
 
@@ -17,7 +17,6 @@ mov edi, 0x1000; read target memory
 mov ecx, 2; start sector
 mov bl, 4; sector count
 call read_disk
-; xchg bx, bx ; bochs magic break
 
 cmp word [0x1000], 0x55aa
 jnz error
@@ -40,11 +39,11 @@ read_disk:
     mov al, bl
     out dx, al
     
-    inc dx; 0x1f3
+    inc dx ; 0x1f3
     mov al, cl; the low 8 bits of start sector 
     out dx, al
 
-    inc dx; 0x1f4
+    inc dx ; 0x1f4
     shr ecx, 8
     mov al, cl
     out dx, al
