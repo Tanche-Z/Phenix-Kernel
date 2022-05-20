@@ -17,8 +17,8 @@ HOST:=$(HOME_BREW_PATH)$(TARGET)-elf-
 # for linux host
 #HOST:=$(LINUX)$(TARGET)-linux-gnu-
 
-#AS:=$(LINUX_PATH)nasm # for linux x86 target 
-AS:=$(HOME_BREW_PATH)nasm # for mac x86 target 
+#NASM:=$(LINUX_PATH)nasm # for linux x86 target 
+NASM:=$(HOME_BREW_PATH)nasm # for mac x86 target 
 #AS:=$(HOST)as # for arm target
 CC:=$(HOST)gcc
 LD:=$(HOST)ld
@@ -39,11 +39,11 @@ INCLUDE:= -I $(SRC)/include/
 
 $(BUILD)/boot/%.bin: $(SRC)/boot/%.asm
 	$(shell mkdir -p $(dir $@))
-	$(AS) -f bin $< -o $@
+	$(NASM) -f bin $< -o $@
 
 $(BUILD)/%.o: $(SRC)/%.asm
 	$(shell mkdir -p $(dir $@))
-	$(AS) -f elf32 -gdwarf $< -o $@
+	$(NASM) -f elf32 -gdwarf $< -o $@
 
 $(BUILD)/%.o: $(SRC)/%.c
 	$(shell mkdir -p $(dir $@))
