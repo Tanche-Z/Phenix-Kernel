@@ -1,6 +1,6 @@
 ** English | [简体中文](./README_zh_cn.md)**<br>
-[![License](https://github.com/HuayuZhangJager/ph1nix/blob/main/LICENSE.txt)]
-[![GitHub release](https://github.com/HuayuZhangJager/ph1nix/releases)]
+[![License](https://img.shields.io/badge/License-MIT-blue)](https://github.com/HuayuZhangJager/ph1nix/blob/main/LICENSE.txt)
+[![GitHub release](https://img.shields.io/badge/Releases-Latest-brightgreen)](https://github.com/HuayuZhangJager/ph1nix/releases/latest)
 
 # ph1nix
 
