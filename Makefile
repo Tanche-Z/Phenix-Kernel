@@ -17,14 +17,15 @@ HOST:=$(HOME_BREW_PATH)$(TARGET)-elf-
 # for linux host
 #HOST:=$(LINUX)$(TARGET)-linux-gnu-
 
-#NASM:=$(LINUX_PATH)nasm # for linux x86 target 
-NASM:=$(HOME_BREW_PATH)nasm # for mac x86 target 
-#AS:=$(HOST)as # for arm target
+# change assembler from NASM to GNU AS(x86)
+#NASM:=$(LINUX_PATH)nasm # for linux host (x86 target)
+#NASM:=$(HOME_BREW_PATH)nasm # for mac host (x86 target)
+AS:=$(HOST)as # using GNU AS
 CC:=$(HOST)gcc
 LD:=$(HOST)ld
 OBJCOPY:=$(HOST)objcopy
 
-CFLAGS:= -m32
+CFLAGS:= -m32 # i386
 CFLAGS+= -fno-builtin # no built-in function in gcc
 CFLAGS+= -fno-pic # no position independent code
 CFLAGS+= -fno-pie # no position independent excutable
@@ -37,13 +38,23 @@ ENTRYPOINT:=0X10000
 DEBUG:= -g
 INCLUDE:= -I $(SRC)/include/
 
-$(BUILD)/boot/%.bin: $(SRC)/boot/%.asm
-	$(shell mkdir -p $(dir $@))
-	$(NASM) -f bin $< -o $@
+# change assembler from NASM to GNU AS(x86)
+# $(BUILD)/boot/%.bin: $(SRC)/boot/%.asm
+# 	$(shell mkdir -p $(dir $@))
+# 	$(NASM) -f bin -gdwarf $< -o $@
 
-$(BUILD)/%.o: $(SRC)/%.asm
+# $(BUILD)/%.o: $(SRC)/%.asm
+# 	$(shell mkdir -p $(dir $@))
+# 	$(NASM) -f elf32 -gdwarf $< -o $@
+
+$(BUILD)/boot/%.bin: $(SRC)/boot/%.S
 	$(shell mkdir -p $(dir $@))
-	$(NASM) -f elf32 -gdwarf $< -o $@
+	$(AS) -g --32 $< -o $<.o
+	$(LD) -oformat binary $<.o -o $@ 
+
+$(BUILD)/%.o: $(SRC)/%.S
+	$(shell mkdir -p $(dir $@))
+	$(AS) -g --32 $< -o $@
 
 $(BUILD)/%.o: $(SRC)/%.c
 	$(shell mkdir -p $(dir $@))
@@ -82,12 +93,15 @@ usb: $(BUILD)/master.img /dev/sda
 	# dd if=$(BUILD)/master.img of=$(BUILD)/boot/usb.bin bs=512 count=1000 conv=notrunc
 	# sudo dd if=$(BUILD)/boot/usb.bin of=/dev/sda bs=512 count=1000 conv=notrunc
 	# rm $(BUILD)/boot/usb.bin
-	sudo dd if=/dev/sda of=$(BUILD)/boot/tmp.bin bs=512 conv=notrunc
-	cp $(BUILD)/boot/tmp.bin $(BUILD)/boot/usb.bin
-	sudo rm $(BUILD)/boot/tmp.bin
-	dd if=$(BUILD)/master.img of=$(BUILD)/boot/usb.bin bs=512 conv=notrunc
-	sudo dd if=$(BUILD)/boot/usb.bin of=/dev/sda bs=512 conv=notrunc
-	rm $(BUILD)/boot/usb.bin
+
+	# sudo dd if=/dev/sda of=$(BUILD)/boot/tmp.bin bs=512 conv=notrunc
+	# cp $(BUILD)/boot/tmp.bin $(BUILD)/boot/usb.bin
+	# sudo rm $(BUILD)/boot/tmp.bin
+	# dd if=$(BUILD)/master.img of=$(BUILD)/boot/usb.bin bs=512 conv=notrunc
+	# sudo dd if=$(BUILD)/boot/usb.bin of=/dev/sda bs=512 conv=notrunc
+	# rm $(BUILD)/boot/usb.bin
+
+	dd if=$(BUILD)/master.img of=/dev/sda
 
 .PHONY: clean
 clean:
@@ -149,3 +163,6 @@ vmdk: $(BUILD)/master.vmdk
 # vbox_usb_test: usb
 # 	sudo vboxmanage internalcommands createrawvmdk -filename $(BUILD)/usb.vmdk -rawdisk /dev/sda; \
 # 	sudo chown kali:kali $(BUILD)/usb.vmdk
+
+.PHONY: test
+test: $(BUILD)/boot/boot.o
