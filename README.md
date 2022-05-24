@@ -1,8 +1,12 @@
+** English | [简体中文](./README_zh_cn.md)**<br>
+[![License](https://github.com/HuayuZhangJager/ph1nix/blob/main/LICENSE.txt)]
+[![GitHub release](https://github.com/HuayuZhangJager/ph1nix/releases)]
+
 # ph1nix
 
-The kernel of ph1nix OS
+The kernel tree of ph1nix OS.
 
-### To Do:
+### <mark>To Do:<mark>
 
 - [ ] Basic Function of System Kernel:
     
@@ -61,7 +65,7 @@ Kernel dev:
 
 - Onix: <https://github.com/StevenBaby/onix>
 
-- 《操作系统真象还原》—— 郑钢
+- _《操作系统真象还原》_—— 郑钢
 
 - OSDev.org: <https://wiki.osdev.org/>
 
@@ -77,14 +81,14 @@ Architecture/Assembly:
   
   - x86:
     - NASM (Intel)
-      - 《x86汇编语言从实模式到保护模式》—— 李忠, 王晓波, 余洁
+      - *《x86汇编语言从实模式到保护模式》*—— 李忠, 王晓波, 余洁
     - GNU AS (AT&T)
       - GAS Document <https://sourceware.org/binutils/docs/as/>
       - AT&T assembly syntax and IA-32 instructions <https://gist.github.com/mishurov/6bcf04df329973c15044>
       - GNU Assembly Syntax <https://en.wikibooks.org/wiki/X86_Assembly/GNU_assembly_syntax>
 
   - ARM:
-    - Programming with 64-Bit ARM Assembly Language Single Board Computer Development for Raspberry Pi and Mobile Devices By Stephen Smith
+    - *Programming with 64-Bit ARM Assembly Language Single Board Computer Development for Raspberry Pi and Mobile Devices* By Stephen Smith
 
   - RISC-V:
 
@@ -92,7 +96,13 @@ Architecture/Assembly:
 C/C++:
 
 - cppreference.com <https://en.cppreference.com/w/>
+- gdb document <https://sourceware.org/gdb/download/onlinedocs/gdb.pdf>
+- glibc document <https://www.gnu.org/software/libc/manual/pdf/libc.pdf>
 
 Hardware Drivers:
 
+- Nvidia Linux open-gpu-kernel-modules <https://github.com/NVIDIA/open-gpu-kernel-modules>
+
 Compiler:
+
+- gcc document <https://gcc.gnu.org/onlinedocs/>
