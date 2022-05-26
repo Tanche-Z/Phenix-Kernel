@@ -1,3 +1,4 @@
+.code16
 .text
 .global _start
 _start:

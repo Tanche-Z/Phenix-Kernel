@@ -1,4 +1,4 @@
-.text
+.code16
 .global _start
 _start:
     # text mode, clear display
@@ -6,16 +6,16 @@ _start:
     int $0x10
 
     mov $0, %ax
-    mov %ax, %dx
+    mov %ax, %ds
     mov %ax, %es
     mov %ax, %ss
-    mov $0x7c00, %sp # MBR address after scan for 0x55, 0xaa
-    mov booting_msg, %si
+    mov $0x7c00, %sp # MBR address load to 0x7c00 after scan for 0x55, 0xaa
+    mov $booting, %si
     call print
 
     mov $0x1000, %edi # read mem
-    mov 2, %ecx # start sector
-    mov 4, %bl # sector count
+    mov $2, %ecx # start sector
+    mov $4, %bl # sector count
     call read_disk
 
     cmpw $0x55aa, 0x1000
@@ -107,16 +107,16 @@ print:
 .done:
     ret
 
+booting:
+    .asciz "Booting ph1nix...\n\r"
+
 error:
-    mov error_msg, %si
+    mov $error_msg, %si
     call print
     hlt
     jmp .
     error_msg:
     .asciz "Booting Error!!!\n\r"
-
-booting_msg:
-    .asciz "Booting ph1nix...\n\r"
 
 # 512-2=510 total size minus last two bytes
 # 510-size of previews code (fill with 0)
@@ -124,7 +124,3 @@ booting_msg:
 
 # last 2 bytes in MBR (2 Byts = 1 Word = 16 Bits)
 .word 0xaa55
-
-
-
-

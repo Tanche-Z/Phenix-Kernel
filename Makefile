@@ -6,7 +6,8 @@ BOCHS_CONFIG:=$(TEST)/bochs/config
 
 # comment or uncomment to choose toolchains
 
-TARGET:=x86_64
+#TARGET:=x86_64
+TARGET:=i686
 #TARGET:=aarch64
 
 HOME_BREW_PATH:=/opt/homebrew/bin/
@@ -34,14 +35,14 @@ CFLAGS+= -nostdinc # no standard header
 CFLAGS+= -nostdlib # no standard library
 CFLAGS:=$(strip ${CFLAGS})
 
-KERNEL_EP:=0X10000
-BOOT_EP:=0X7c00
-LOADER_EP:=0X1000
+KERNEL_EP:=0x10000
+BOOT_EP:=0x7c00
+LOADER_EP:=0x1000
 
 DEBUG:= -g
 INCLUDE:= -I $(SRC)/include/
 
-# change assembler from NASM to GNU AS(x86)
+# # change assembler from NASM to GNU AS(x86)
 # $(BUILD)/boot/%.bin: $(SRC)/boot/%.asm
 # 	$(shell mkdir -p $(dir $@))
 # 	$(NASM) -f bin $< -o $@
@@ -52,14 +53,14 @@ INCLUDE:= -I $(SRC)/include/
 
 $(BUILD)/boot/boot.bin: $(SRC)/boot/boot.S
 	$(shell mkdir -p $(dir $@))
-	$(AS) -g --32 $< -o $@.o
-	$(LD) -m elf_i386 -static $@.o -o $@.elf -Ttext $(BOOT_EP)
+	$(AS) -g $< -o $@.o
+	$(LD) -static $@.o -o $@.elf -Ttext $(BOOT_EP)
 	$(OBJCOPY) -O binary $@.elf $@
 
 $(BUILD)/boot/loader.bin: $(SRC)/boot/loader.S
 	$(shell mkdir -p $(dir $@))
-	$(AS) -g --32 $< -o $@.o
-	$(LD) -m elf_i386 -static $@.o -o $@.elf -Ttext $(LOADER_EP)
+	$(AS) -g $< -o $@.o
+	$(LD) -static $@.o -o $@.elf -Ttext $(LOADER_EP)
 	$(OBJCOPY) -O binary $@.elf $@
 
 #$(LD) -m elf_i386 -static $^ -o $@ -Ttext $(BOOT_EP)

@@ -1,5 +1,4 @@
 [org 0x7c00] ; just for NASM to output bin file (hint for assembler and linkder of base address(entry point))
-
 ; Set screen mode as text mode, clear screen.
 mov ax, 3
 int 0x10
