@@ -66,7 +66,7 @@ $(BUILD)/boot/loader.bin: $(SRC)/boot/loader.S
 
 $(BUILD)/%.o: $(SRC)/%.S
 	$(shell mkdir -p $(dir $@))
-	$(AS) -g --32 $< -o $@
+	$(AS) -g $< -o $@
 
 $(BUILD)/%.o: $(SRC)/%.c
 	$(shell mkdir -p $(dir $@))
@@ -89,9 +89,8 @@ $(BUILD)/system.map: $(BUILD)/kernel.bin
 
 $(BUILD)/master.img: $(BUILD)/boot/boot.bin \
 	$(BUILD)/boot/loader.bin \
-
-# $(BUILD)/system.bin \
-# $(BUILD)/system.map \
+	$(BUILD)/system.bin \
+	$(BUILD)/system.map \
 
 	yes | bximage -q -hd=16 -func=create -sectsize=512 -imgmode=flat $@
 	dd if=$(BUILD)/boot/boot.bin of=$@ bs=512 count=1 conv=notrunc
