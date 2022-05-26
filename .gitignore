@@ -5,7 +5,6 @@
 *.out
 *.o
 *.so
-*.s
 *.zst
 *.gz
 *.map

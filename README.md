@@ -82,10 +82,12 @@ Architecture/Assembly:
   - x86:
     - NASM (Intel)
       - *《x86汇编语言从实模式到保护模式》*—— 李忠, 王晓波, 余洁
+      - NASM Doc <https://nasm.us/doc/>
     - GNU AS (AT&T)
       - GAS Document <https://sourceware.org/binutils/docs/as/>
       - AT&T assembly syntax and IA-32 instructions <https://gist.github.com/mishurov/6bcf04df329973c15044>
       - GNU Assembly Syntax <https://en.wikibooks.org/wiki/X86_Assembly/GNU_assembly_syntax>
+    - Apple Silicon assembly <https://github.com/below/HelloSilicon>
 
   - ARM:
     - *Programming with 64-Bit ARM Assembly Language Single Board Computer Development for Raspberry Pi and Mobile Devices* By Stephen Smith

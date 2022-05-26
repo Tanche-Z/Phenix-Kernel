@@ -1,4 +1,4 @@
-[org 0x7c00]
+[org 0x7c00] ; just for NASM to output bin file (hint for assembler and linkder of base address(entry point))
 
 ; Set screen mode as text mode, clear screen.
 mov ax, 3
@@ -59,7 +59,7 @@ read_disk:
 
     mov al, 0b1110_0000;
     or al, cl
-    out dx, al ;LBA mdoe
+    out dx, al ; LBA mode
 
     inc dx; 0x1f7
     mov al, 0x20 ; read hard disk
@@ -197,7 +197,7 @@ error:
     call print
     hlt
     jmp $
-    .msg db "Booting Error!!!", 10, 13,0
+    .msg db "Booting Error!!!", 10, 13, 0
 
 times 510 - ($ - $$) db 0
 

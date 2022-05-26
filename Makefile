@@ -19,7 +19,7 @@ HOST:=$(HOME_BREW_PATH)$(TARGET)-elf-
 
 # change assembler from NASM to GNU AS(x86)
 #NASM:=$(LINUX_PATH)nasm # for linux host (x86 target)
-#NASM:=$(HOME_BREW_PATH)nasm # for mac host (x86 target)
+NASM:=$(HOME_BREW_PATH)nasm # for mac host (x86 target)
 AS:=$(HOST)as # using GNU AS
 CC:=$(HOST)gcc
 LD:=$(HOST)ld
@@ -34,23 +34,36 @@ CFLAGS+= -nostdinc # no standard header
 CFLAGS+= -nostdlib # no standard library
 CFLAGS:=$(strip ${CFLAGS})
 
-ENTRYPOINT:=0X10000
+KERNEL_EP:=0X10000
+BOOT_EP:=0X7c00
+LOADER_EP:=0X1000
+
 DEBUG:= -g
 INCLUDE:= -I $(SRC)/include/
 
 # change assembler from NASM to GNU AS(x86)
 # $(BUILD)/boot/%.bin: $(SRC)/boot/%.asm
 # 	$(shell mkdir -p $(dir $@))
-# 	$(NASM) -f bin -gdwarf $< -o $@
+# 	$(NASM) -f bin $< -o $@
 
 # $(BUILD)/%.o: $(SRC)/%.asm
 # 	$(shell mkdir -p $(dir $@))
 # 	$(NASM) -f elf32 -gdwarf $< -o $@
 
-$(BUILD)/boot/%.bin: $(SRC)/boot/%.S
+$(BUILD)/boot/boot.bin: $(SRC)/boot/boot.S
 	$(shell mkdir -p $(dir $@))
-	$(AS) -g --32 $< -o $<.o
-	$(LD) -oformat binary $<.o -o $@ 
+	$(AS) -g --32 $< -o $@.o
+	$(LD) -m elf_i386 -static $@.o -o $@.elf -Ttext $(BOOT_EP)
+	$(OBJCOPY) -O binary $@.elf $@
+
+$(BUILD)/boot/loader.bin: $(SRC)/boot/loader.S
+	$(shell mkdir -p $(dir $@))
+	$(AS) -g --32 $< -o $@.o
+	$(LD) -m elf_i386 -static $@.o -o $@.elf -Ttext $(LOADER_EP)
+	$(OBJCOPY) -O binary $@.elf $@
+
+#$(LD) -m elf_i386 -static $^ -o $@ -Ttext $(BOOT_EP)
+# $(OBJCOPY) -O binary $@.elf $@
 
 $(BUILD)/%.o: $(SRC)/%.S
 	$(shell mkdir -p $(dir $@))
@@ -67,7 +80,7 @@ $(BUILD)/kernel.bin: \
 	$(BUILD)/lib/string.o
 
 	$(shell mkdir -p $(dir $@))
-	$(LD) -m elf_i386 -static $^ -o $@ -Ttext $(ENTRYPOINT)
+	$(LD) -m elf_i386 -static $^ -o $@ -Ttext $(KERNEL_EP)
 
 $(BUILD)/system.bin: $(BUILD)/kernel.bin
 	$(OBJCOPY) -O binary $< $@
@@ -76,14 +89,15 @@ $(BUILD)/system.map: $(BUILD)/kernel.bin
 	nm $< | sort > $@
 
 $(BUILD)/master.img: $(BUILD)/boot/boot.bin \
-	$(BUILD)/boot/loader.bin \
-	$(BUILD)/system.bin \
-	$(BUILD)/system.map \
+
+# $(BUILD)/boot/loader.bin \
+# $(BUILD)/system.bin \
+# $(BUILD)/system.map \
 
 	yes | bximage -q -hd=16 -func=create -sectsize=512 -imgmode=flat $@
 	dd if=$(BUILD)/boot/boot.bin of=$@ bs=512 count=1 conv=notrunc
-	dd if=$(BUILD)/boot/loader.bin of=$@ bs=512 count=4 seek=2 conv=notrunc
-	dd if=$(BUILD)/system.bin of=$@ bs=512 count=200 seek=10 conv=notrunc
+#dd if=$(BUILD)/boot/loader.bin of=$@ bs=512 count=4 seek=2 conv=notrunc
+#dd if=$(BUILD)/system.bin of=$@ bs=512 count=200 seek=10 conv=notrunc
 
 .PHONY: usb # sample code for write image to USB device
 usb: $(BUILD)/master.img /dev/sda

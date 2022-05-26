@@ -20,7 +20,7 @@ detect_memory:
 .next:
     ; No. of subfuction
     mov eax, 0xe820
-    ;ards the size of stucture (in in bytes)
+    ;ards the size of structure (in bytes)
     mov ecx, 20
     ; system call 0x15
     int 0x15
@@ -43,12 +43,12 @@ detect_memory:
     jmp pre_protected_mode
 
 pre_protected_mode:
-    cli ; close interrupt
+    cli ; clear interrupt
     ; open A20
     in al, 0x92
     or al, 0b10
     out 0x92, al
-    lgdt [gdt_ptr]; load get
+    lgdt [gdt_ptr] ; load get
     ; PE (Protect Enable)
     mov eax ,cr0
     or eax, 1
@@ -202,5 +202,5 @@ gdt_data:
 gdt_end:
 
 ards_count:
-    dw 0
+    dd 0
 ards_buffer:
