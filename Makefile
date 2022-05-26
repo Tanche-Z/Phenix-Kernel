@@ -25,6 +25,7 @@ AS:=$(HOST)as # using GNU AS
 CC:=$(HOST)gcc
 LD:=$(HOST)ld
 OBJCOPY:=$(HOST)objcopy
+OBJDUMP:=$(HOST)objdump
 
 CFLAGS:= -m32 # i386
 CFLAGS+= -fno-builtin # no built-in function in gcc
@@ -127,6 +128,10 @@ clean:
 .PHONY: image
 image: $(BUILD)/master.img
 	cp $(BOCHS_CONFIG)/win32_guidebug/bochsrc $(SRC)
+
+.PHONY: disam_boot
+disam_boot:
+	$(OBJDUMP) -D -b binary -m i386:x86-64 $(BUILD)/boot/boot.bin
 
 # # Windows gdb (Windows Local debugging using Samba)
 # .PHONY: image_gdb
