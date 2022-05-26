@@ -6,8 +6,8 @@ BOCHS_CONFIG:=$(TEST)/bochs/config
 
 # comment or uncomment to choose toolchains
 
-#TARGET:=x86_64
 TARGET:=i686
+#TARGET:=x86_64
 #TARGET:=aarch64
 
 HOME_BREW_PATH:=/opt/homebrew/bin/
@@ -36,9 +36,9 @@ CFLAGS+= -nostdinc # no standard header
 CFLAGS+= -nostdlib # no standard library
 CFLAGS:=$(strip ${CFLAGS})
 
-KERNEL_EP:=0x10000
 BOOT_EP:=0x7c00
 LOADER_EP:=0x1000
+KERNEL_EP:=0x10000
 
 DEBUG:= -g
 INCLUDE:= -I $(SRC)/include/
@@ -64,9 +64,6 @@ $(BUILD)/boot/loader.bin: $(SRC)/boot/loader.S
 	$(LD) -static $@.o -o $@.elf -Ttext $(LOADER_EP)
 	$(OBJCOPY) -O binary $@.elf $@
 
-#$(LD) -m elf_i386 -static $^ -o $@ -Ttext $(BOOT_EP)
-# $(OBJCOPY) -O binary $@.elf $@
-
 $(BUILD)/%.o: $(SRC)/%.S
 	$(shell mkdir -p $(dir $@))
 	$(AS) -g --32 $< -o $@
@@ -91,14 +88,14 @@ $(BUILD)/system.map: $(BUILD)/kernel.bin
 	nm $< | sort > $@
 
 $(BUILD)/master.img: $(BUILD)/boot/boot.bin \
+	$(BUILD)/boot/loader.bin \
 
-# $(BUILD)/boot/loader.bin \
 # $(BUILD)/system.bin \
 # $(BUILD)/system.map \
 
 	yes | bximage -q -hd=16 -func=create -sectsize=512 -imgmode=flat $@
 	dd if=$(BUILD)/boot/boot.bin of=$@ bs=512 count=1 conv=notrunc
-#dd if=$(BUILD)/boot/loader.bin of=$@ bs=512 count=4 seek=2 conv=notrunc
+	dd if=$(BUILD)/boot/loader.bin of=$@ bs=512 count=4 seek=2 conv=notrunc
 #dd if=$(BUILD)/system.bin of=$@ bs=512 count=200 seek=10 conv=notrunc
 
 .PHONY: usb # sample code for write image to USB device
