@@ -25,6 +25,8 @@ The kernel tree of ph1nix OS.
 
 - [ ] TCP/IP
 
+- [ ] NASM to GNU AS
+
 - [ ] i386 to x86_64
 
 - [ ] Port to ARMV8 (aarch64)

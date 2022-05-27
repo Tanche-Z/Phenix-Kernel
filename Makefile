@@ -6,21 +6,22 @@ BOCHS_CONFIG:=$(TEST)/bochs/config
 
 # comment or uncomment to choose toolchains
 
-TARGET:=i686
-#TARGET:=x86_64
+#TARGET:=i686
+TARGET:=x86_64
 #TARGET:=aarch64
 
 HOME_BREW_PATH:=/opt/homebrew/bin/
 LINUX_PATH:=/usr/bin/
 
 # for mac host
-HOST:=$(HOME_BREW_PATH)$(TARGET)-elf-
+#HOST:=$(HOME_BREW_PATH)$(TARGET)-elf-
 # for linux host
-#HOST:=$(LINUX)$(TARGET)-linux-gnu-
+# HOST:=$(LINUX_PATH)$(TARGET)-linux-gnu-
+HOST:=$(LINUX_PATH)
 
 # change assembler from NASM to GNU AS(x86)
-#NASM:=$(LINUX_PATH)nasm # for linux host (x86 target)
-NASM:=$(HOME_BREW_PATH)nasm # for mac host (x86 target)
+NASM:=$(LINUX_PATH)nasm # for linux host (x86 target)
+#NASM:=$(HOME_BREW_PATH)nasm # for mac host (x86 target)
 AS:=$(HOST)as # using GNU AS
 CC:=$(HOST)gcc
 LD:=$(HOST)ld
@@ -43,30 +44,30 @@ KERNEL_EP:=0x10000
 DEBUG:= -g
 INCLUDE:= -I $(SRC)/include/
 
-# # change assembler from NASM to GNU AS(x86)
-# $(BUILD)/boot/%.bin: $(SRC)/boot/%.asm
+# change assembler from NASM to GNU AS(x86)
+$(BUILD)/boot/%.bin: $(SRC)/boot/%.asm
+	$(shell mkdir -p $(dir $@))
+	$(NASM) -f bin $< -o $@
+
+$(BUILD)/%.o: $(SRC)/%.asm
+	$(shell mkdir -p $(dir $@))
+	$(NASM) -f elf32 -gdwarf $< -o $@
+
+# $(BUILD)/boot/boot.bin: $(SRC)/boot/boot.S
 # 	$(shell mkdir -p $(dir $@))
-# 	$(NASM) -f bin $< -o $@
+# 	$(AS) --gstabs $< -o $@.o
+# 	$(LD) -m elf_i386 -static $@.o -o $@.elf -Ttext $(BOOT_EP)
+# 	$(OBJCOPY) -O binary $@.elf $@
 
-# $(BUILD)/%.o: $(SRC)/%.asm
+# $(BUILD)/boot/loader.bin: $(SRC)/boot/loader.S
 # 	$(shell mkdir -p $(dir $@))
-# 	$(NASM) -f elf32 -gdwarf $< -o $@
+# 	$(AS) --gstabs $< -o $@.o
+# 	$(LD) -m elf_i386 -static $@.o -o $@.elf -Ttext $(LOADER_EP)
+# 	$(OBJCOPY) -O binary $@.elf $@
 
-$(BUILD)/boot/boot.bin: $(SRC)/boot/boot.S
-	$(shell mkdir -p $(dir $@))
-	$(AS) -g $< -o $@.o
-	$(LD) -static $@.o -o $@.elf -Ttext $(BOOT_EP)
-	$(OBJCOPY) -O binary $@.elf $@
-
-$(BUILD)/boot/loader.bin: $(SRC)/boot/loader.S
-	$(shell mkdir -p $(dir $@))
-	$(AS) -g $< -o $@.o
-	$(LD) -static $@.o -o $@.elf -Ttext $(LOADER_EP)
-	$(OBJCOPY) -O binary $@.elf $@
-
-$(BUILD)/%.o: $(SRC)/%.S
-	$(shell mkdir -p $(dir $@))
-	$(AS) -g $< -o $@
+# $(BUILD)/%.o: $(SRC)/%.S
+# 	$(shell mkdir -p $(dir $@))
+# 	$(AS) --gstabs $< -o $@
 
 $(BUILD)/%.o: $(SRC)/%.c
 	$(shell mkdir -p $(dir $@))
@@ -95,7 +96,7 @@ $(BUILD)/master.img: $(BUILD)/boot/boot.bin \
 	yes | bximage -q -hd=16 -func=create -sectsize=512 -imgmode=flat $@
 	dd if=$(BUILD)/boot/boot.bin of=$@ bs=512 count=1 conv=notrunc
 	dd if=$(BUILD)/boot/loader.bin of=$@ bs=512 count=4 seek=2 conv=notrunc
-#dd if=$(BUILD)/system.bin of=$@ bs=512 count=200 seek=10 conv=notrunc
+	dd if=$(BUILD)/system.bin of=$@ bs=512 count=200 seek=10 conv=notrunc
 
 .PHONY: usb # sample code for write image to USB device
 usb: $(BUILD)/master.img /dev/sda

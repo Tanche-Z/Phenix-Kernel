@@ -1,5 +1,5 @@
-.code16
 .text
+.code16
 .global _start
 _start:
 .word 0x55aa # magic for judgement
@@ -48,7 +48,7 @@ pre_protected_mode:
     in $0x92, %al
     or $0b10, %al
     out %al, $0x92
-    lgdt gdt_ptr # load get
+    lgdtl gdt_ptr # load GDT
     # PE(Protect Enable)
     mov %cr0, %eax
     or $1, %eax
