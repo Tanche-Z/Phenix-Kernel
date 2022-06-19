@@ -44,7 +44,6 @@ KERNEL_EP:=0x10000
 DEBUG:= -g
 INCLUDE:= -I $(SRC)/include/
 
-# change assembler from NASM to GNU AS(x86)
 $(BUILD)/boot/%.bin: $(SRC)/boot/%.asm
 	$(shell mkdir -p $(dir $@))
 	$(NASM) -f bin $< -o $@
@@ -53,6 +52,7 @@ $(BUILD)/%.o: $(SRC)/%.asm
 	$(shell mkdir -p $(dir $@))
 	$(NASM) -f elf32 -gdwarf $< -o $@
 
+# change assembler from NASM to GNU AS(x86)
 # $(BUILD)/boot/boot.bin: $(SRC)/boot/boot.S
 # 	$(shell mkdir -p $(dir $@))
 # 	$(AS) --gstabs $< -o $@.o
@@ -77,6 +77,7 @@ $(BUILD)/kernel.bin: \
 	$(BUILD)/kernel/start.o \
 	$(BUILD)/kernel/main.o \
 	$(BUILD)/kernel/io.o \
+	$(BUILD)/kernel/console.o \
 	$(BUILD)/lib/string.o
 
 	$(shell mkdir -p $(dir $@))
