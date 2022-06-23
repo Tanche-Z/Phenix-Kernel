@@ -4,9 +4,18 @@
 #include <ph1nix/string.h>
 #include <ph1nix/console.h>
 
+char message[] = "hello ph1nix!!!\n";
+char buf[1024];
+
 void _kernel_init()
 {
     console_init();
+
+    u32 count = 26;
+    while (count --)
+    {
+        console_write(message, sizeof(message) - 1);
+    }
 
     return;
 }
