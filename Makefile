@@ -1,40 +1,44 @@
 SRC:=.
-TEST=./test
+TEST=./ph1nix_test
 BUILD:=./build
 TEST_BUILD:=$(TEST)/build
 BOCHS_CONFIG:=$(TEST)/bochs/config
 
 # comment or uncomment to choose toolchains
 
-#TARGET:=i686
-TARGET:=x86_64
+TARGET:=i686-elf-
+#TARGET:=x86_64
 #TARGET:=aarch64
 
 HOME_BREW_PATH:=/opt/homebrew/bin/
 LINUX_PATH:=/usr/bin/
 
 # for mac host
-#HOST:=$(HOME_BREW_PATH)$(TARGET)-elf-
+#CROSS:=$(HOME_BREW_PATH)$(TARGET)
 # for linux host
-# HOST:=$(LINUX_PATH)$(TARGET)-linux-gnu-
-HOST:=$(LINUX_PATH)
+# CROSS:=$(LINUX_PATH)$(TARGET)-linux-gnu-
+CROSS:=$(LINUX_PATH)$(TARGET)
+# CROSS:=$(LINUX_PATH)
 
 # change assembler from NASM to GNU AS(x86)
 NASM:=$(LINUX_PATH)nasm # for linux host (x86 target)
 #NASM:=$(HOME_BREW_PATH)nasm # for mac host (x86 target)
-AS:=$(HOST)as # using GNU AS
-CC:=$(HOST)gcc
-LD:=$(HOST)ld
-OBJCOPY:=$(HOST)objcopy
-OBJDUMP:=$(HOST)objdump
+AS:=$(CROSS)as # using GNU AS
+CC:=$(CROSS)gcc
+LD:=$(CROSS)ld
+OBJCOPY:=$(CROSS)objcopy
+OBJDUMP:=$(CROSS)objdump
+GDB:=$(CROSS)gdb
 
-CFLAGS:= -m32 # i386
-CFLAGS+= -fno-builtin # no built-in function in gcc
+
+CFLAGS:= -fno-builtin # no built-in function in gcc
 CFLAGS+= -fno-pic # no position independent code
 CFLAGS+= -fno-pie # no position independent excutable
 CFLAGS+= -fno-stack-protector # no stack protector
 CFLAGS+= -nostdinc # no standard header
 CFLAGS+= -nostdlib # no standard library
+# CFLAGS+= -m32 # (when using gcc target x86_64) i386 mode
+CFLAGS+= -Wa,--32 # (when using i686 gcc) pass option to assembler (generate 32bits code)
 CFLAGS:=$(strip ${CFLAGS})
 
 BOOT_EP:=0x7c00
@@ -92,7 +96,7 @@ $(BUILD)/system.map: $(BUILD)/kernel.bin
 $(BUILD)/master.img: $(BUILD)/boot/boot.bin \
 	$(BUILD)/boot/loader.bin \
 	$(BUILD)/system.bin \
-	$(BUILD)/system.map \
+	$(BUILD)/system.map
 
 	yes | bximage -q -hd=16 -func=create -sectsize=512 -imgmode=flat $@
 	dd if=$(BUILD)/boot/boot.bin of=$@ bs=512 count=1 conv=notrunc
