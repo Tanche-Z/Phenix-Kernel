@@ -11,8 +11,7 @@ void _kernel_init()
 {
     console_init();
 
-    u32 count = 26;
-    while (count --)
+    while (true)
     {
         console_write(message, sizeof(message) - 1);
     }

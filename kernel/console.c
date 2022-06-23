@@ -1,5 +1,6 @@
 #include <ph1nix/console.h>
 #include <ph1nix/io.h>
+#include <ph1nix/string.h>
 
 #define CRT_ADDR_REG 0x3D4 // CRT(6845) index register
 #define CRT_DATA_REG 0x3D5 // CRT(6845) data register
@@ -108,6 +109,12 @@ static void scroll_up()
         screen_base += ROW_SIZE;
         y++;
         cursor_base += ROW_SIZE;
+    }
+    else
+    {
+        memcpy(MEM_BASE, screen_base, MEM_SIZE);
+        cursor_base -= (screen_base - MEM_BASE);
+        screen_base = MEM_BASE;
     }
 
     set_screen();
