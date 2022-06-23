@@ -13,8 +13,8 @@ _start:
     mov $booting, %si
     call print
 
-    mov $0x1000, %edi # read mem
-    mov $2, %ecx # start sector
+    movl $0x1000, %edi # read mem
+    movl $2, %ecx # start sector
     mov $4, %bl # sector count
     call read_disk
 
