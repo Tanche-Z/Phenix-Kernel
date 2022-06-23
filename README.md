@@ -14,7 +14,7 @@ The kernel tree of ph1nix OS.
     - [x] Protect mode
     - [x] IO
     - [x] String
-    - [ ] Display driver (simplified)
+    - [x] VGA
     - [ ] Process management
     - [ ] Memory management
     - [ ] File system
