@@ -14,7 +14,7 @@
 .section .text
     start_:
         movl $stack_top, %esp
-        call kernel_init
+        call _kernel_init
 
         pushl %ebx
         call kernel_main
