@@ -84,7 +84,7 @@ $(BUILD)/kernel.bin: \
 	$(BUILD)/kernel/console.o \
 	$(BUILD)/kernel/printk.o \
 	$(BUILD)/lib/string.o \
-	$(BUILD)/lib/vsprintf.o \
+	$(BUILD)/lib/vsprintf.o
 
 
 	$(shell mkdir -p $(dir $@))
