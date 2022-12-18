@@ -166,11 +166,6 @@ image: $(BUILD)/master.img
 disam_boot:
 	$(OBJDUMP) -D -b binary -m i386:x86-64 $(BUILD)/boot/boot.bin
 
-# # Windows gdb (Windows Local debugging using Samba)
-# .PHONY: image_gdb
-# image_gdb: $(BUILD)/master.img
-# 	cp $(BOCHS_CONFIG)/win32_guidebug/bochsrc_gdb $(SRC)
-
 # Linux X11 gui-debug
 .PHONY: bochs
 bochs: $(BUILD)/master.img
