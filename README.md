@@ -77,6 +77,7 @@ The kernel tree of ph1nix OS.
 - (Debian) apt packages:
   - gcc-i686-linux-gnu
   - binutils-i686-linux-gnu
+  - i386-elf-gdb
   - nasm
   - qemu-system-x86
   - bochs
