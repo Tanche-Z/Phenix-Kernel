@@ -23,16 +23,20 @@ The kernel tree of ph1nix OS.
 
 - [ ] Posix
 
-- [ ] TCP/IP
+- [ ] Toolchain imgration/support (to Clang)
+
+- [ ] Toolchain migration (to Rust)
+
+- [ ] Network Stack (TCP/IP)
 
 - [ ] NASM to GNU AS
 
-- [ ] i386 to x86_64
+- [ ] i686 to x86_64
 
 - [ ] Port to ARMV8 (aarch64)
   
   - [ ] qemu-system-aarch64
-  - [ ] support for Raspberry Pi 4B (ARMV8)
+  - [ ] support for Raspberry Pi 4B (Cortex-a72)(ARMV8)
 
 - [ ] BIOS (Legacy) to UEFI + support grub2
 
@@ -57,56 +61,29 @@ The kernel tree of ph1nix OS.
   - [ ] vim
   - [ ] gnu toolchain
   - [ ] llvm
+  - [ ] Rust
   - [ ] DE (kde/xfce/gnome)
-
 ---
 
-## Thanks for the work of following projects, repo, books, websites and documents ... :
-
-Kernel dev:
-
-- Onix: <https://github.com/StevenBaby/onix>
-
-- _《操作系统真象还原》_—— 郑钢
-
-- OSDev.org: <https://wiki.osdev.org/>
-
-- OSDever.net <http://www.osdever.net/>
-
-Posix:
-
-Unix network & TCP/IP:
-
-UEFI:
-
-Architecture/Assembly:
-  
-  - x86:
-    - NASM (Intel)
-      - *《x86汇编语言从实模式到保护模式》*—— 李忠, 王晓波, 余洁
-      - NASM Doc <https://nasm.us/doc/>
-    - GNU AS (AT&T)
-      - GAS Document <https://sourceware.org/binutils/docs/as/>
-      - AT&T assembly syntax and IA-32 instructions <https://gist.github.com/mishurov/6bcf04df329973c15044>
-      - GNU Assembly Syntax <https://en.wikibooks.org/wiki/X86_Assembly/GNU_assembly_syntax>
-    - Apple Silicon assembly <https://github.com/below/HelloSilicon>
-
-  - ARM:
-    - *Programming with 64-Bit ARM Assembly Language Single Board Computer Development for Raspberry Pi and Mobile Devices* By Stephen Smith
-
-  - RISC-V:
-
-
-C/C++:
-
-- cppreference.com <https://en.cppreference.com/w/>
-- gdb document <https://sourceware.org/gdb/download/onlinedocs/gdb.pdf>
-- glibc document <https://www.gnu.org/software/libc/manual/pdf/libc.pdf>
-
-Hardware Drivers:
-
-- Nvidia Linux open-gpu-kernel-modules <https://github.com/NVIDIA/open-gpu-kernel-modules>
-
-Compiler:
-
-- gcc document <https://gcc.gnu.org/onlinedocs/>
+# Current Dev Env
+## MacOS (Apple Silicon)
+- Homebrew packages:
+  - i686-elf-gcc
+  - i686-elf-binutils
+  - nasm
+  - qemu
+  - bochs
+## Linux (aarch64) 
+- (Debian) apt packages:
+  - gcc-i686-linux-gnu
+  - binutils-i686-linux-gnu
+  - nasm
+  - qemu-system-x86
+  - bochs
+## Linux (x86_64) 
+- (Debian) apt packages:
+  - gcc-i686-linux-gnu
+  - binutils-i686-linux-gnu
+  - nasm
+  - qemu-system-x86
+  - bochs
