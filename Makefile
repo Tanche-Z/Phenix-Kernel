@@ -4,32 +4,55 @@ BUILD:=./build
 TEST_BUILD:=$(TEST)/build
 BOCHS_CONFIG:=$(TEST)/bochs/config
 
-# comment or uncomment to choose toolchains
-
+# Set cross compile tools chain
+HOME_BREW_ARM64_PATH:=/opt/homebrew/bin/
+LINUX_PATH:=/usr/bin/
+LINUX_ARM64_PATH:=$(LINUX_PATH)$(TARGET)-linux-gnu-
 TARGET:=i686-elf-
 #TARGET:=x86_64
 #TARGET:=aarch64
+HOST_ARCH:=$(shell uname -m)
+HOST_KERNEL:=$(shell uname -s)
+# Host: Apple Silicon Mac(arm64), Target: i686 (32bits)
+ifeq ($(HOST_KERNEL), Darwin)
+	ifeq ($(HOST_ARCH), arm64)
+		ifeq ($(TARGET), i686-elf-)
+		TOOL_PATH:=$(HOME_BREW_ARM64_PATH)$(TARGET)
+		NASM=:=$(HOME_BREW_ARM64_PATH)nasm
+		GDB:=$(HOME_BREW_ARM64_PATH)i386-elf-gdb
+		endif
+	endif
+endif
 
-HOME_BREW_PATH:=/opt/homebrew/bin/
-LINUX_PATH:=/usr/bin/
+ifeq ($(HOST_KERNEL), Linux) 
+	ifeq ($(HOST_ARCH), x86_64)
+		ifeq ($(TARGET), i686-elf-)	# Host: Linux (x86_64), Target: i686 (32bits)
+		TOOL_PATH:=$(LINUX_PATH)$(TARGET)
+		NASM:=$(LINUX_PATH)nasm
+		endif
+		ifeq ($(HOST_ARCH), arm64)	# Host: Linux (arm64), Target: i686 (32bits)
+		TOOL_PATH:=$(LINUX_PATH)$(TARGET)-linux-gnu-
+		endif
+	endif
+endif
 
-# for mac host
-#CROSS:=$(HOME_BREW_PATH)$(TARGET)
-# for linux host
-# CROSS:=$(LINUX_PATH)$(TARGET)-linux-gnu-
-CROSS:=$(LINUX_PATH)$(TARGET)
-# CROSS:=$(LINUX_PATH)
+AS:=$(TOOL_PATH)as
+CC:=$(TOOL_PATH)gcc
+LD:=$(TOOL_PATH)ld
+OBJCOPY:=$(TOOL_PATH)objcopy
+OBJDUMP:=$(TOOL_PATH)objdump
 
-# change assembler from NASM to GNU AS(x86)
-NASM:=$(LINUX_PATH)nasm # for linux host (x86 target)
-#NASM:=$(HOME_BREW_PATH)nasm # for mac host (x86 target)
-AS:=$(CROSS)as # using GNU AS
-CC:=$(CROSS)gcc
-LD:=$(CROSS)ld
-OBJCOPY:=$(CROSS)objcopy
-OBJDUMP:=$(CROSS)objdump
-GDB:=$(CROSS)gdb
-
+.PHONY: show_config
+show_config:
+	$(info $$HOST_ARCH = ${HOST_ARCH})
+	$(info $$HOST_KERNEL = ${HOST_KERNEL})
+	$(info $$AS = ${AS})
+	$(info $$LD = ${LD})
+	$(info $$CC = ${CC})
+	$(info $$OBJCOPY = ${OBJCOPY})
+	$(info $$OBJDUMP = ${OBJDUMP})
+	$(info $$GDB = ${GDB})
+	$(info $$NASM = ${NASM})
 
 CFLAGS:= -fno-builtin # no built-in function in gcc
 CFLAGS+= -fno-pic # no position independent code
