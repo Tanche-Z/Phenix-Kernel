@@ -18,7 +18,7 @@ ifeq ($(HOST_KERNEL), Darwin)
 	ifeq ($(HOST_ARCH), arm64)
 		ifeq ($(TARGET), i686-elf-)
 		TOOL_PATH:=$(HOME_BREW_ARM64_PATH)$(TARGET)
-		NASM=:=$(HOME_BREW_ARM64_PATH)nasm
+		NASM:=$(HOME_BREW_ARM64_PATH)nasm
 		GDB:=$(HOME_BREW_ARM64_PATH)i386-elf-gdb
 		endif
 	endif
