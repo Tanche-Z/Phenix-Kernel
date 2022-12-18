@@ -7,8 +7,7 @@ BOCHS_CONFIG:=$(TEST)/bochs/config
 # Set cross compile tools chain
 HOME_BREW_ARM64_PATH:=/opt/homebrew/bin/
 LINUX_PATH:=/usr/bin/
-LINUX_ARM64_PATH:=$(LINUX_PATH)i686-linux-gnu-
-TARGET:=i686-elf-
+TARGET:=i686
 #TARGET:=x86_64
 #TARGET:=aarch64
 HOST_ARCH:=$(shell uname -m)
@@ -16,8 +15,8 @@ HOST_KERNEL:=$(shell uname -s)
 # Host: Apple Silicon Mac(arm64), Target: i686 (32bits)
 ifeq ($(HOST_KERNEL), Darwin)
 	ifeq ($(HOST_ARCH), arm64)
-		ifeq ($(TARGET), i686-elf-)
-		TOOL_PATH:=$(HOME_BREW_ARM64_PATH)$(TARGET)
+		ifeq ($(TARGET), i686)
+		TOOL_PATH:=$(HOME_BREW_ARM64_PATH)$(TARGET)-elf-
 		NASM:=$(HOME_BREW_ARM64_PATH)nasm
 		GDB:=$(HOME_BREW_ARM64_PATH)i386-elf-gdb
 		endif
@@ -28,15 +27,15 @@ ifeq ($(HOST_KERNEL), Linux)
 	NASM:=$(LINUX_PATH)nasm
 	GDB:=$(LINUX_PATH)gdb
 	ifeq ($(HOST_ARCH), x86_64)
-		ifeq ($(TARGET), i686-elf-)
+		ifeq ($(TARGET), i686)
 			# Host: Linux (x86_64), Target: i686 (32bits)
-			TOOL_PATH:=$(LINUX_PATH)$(TARGET)
+			TOOL_PATH:=$(LINUX_PATH)$(TARGET)-linux-gnu-
 		endif
 	endif
 	ifeq ($(HOST_ARCH), aarch64)	
-		ifeq ($(TARGET), i686-elf-)
+		ifeq ($(TARGET), i686)
 			# Host: Linux (arm64), Target: i686 (32bits)
-			TOOL_PATH:=$(LINUX_ARM64_PATH)
+			TOOL_PATH:=$(LINUX_PATH)$(TARGET)-linux-gnu-
 		endif
 	endif
 endif
