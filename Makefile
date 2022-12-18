@@ -7,7 +7,7 @@ BOCHS_CONFIG:=$(TEST)/bochs/config
 # Set cross compile tools chain
 HOME_BREW_ARM64_PATH:=/opt/homebrew/bin/
 LINUX_PATH:=/usr/bin/
-LINUX_ARM64_PATH:=$(LINUX_PATH)$(TARGET)-linux-gnu-
+LINUX_ARM64_PATH:=$(LINUX_PATH)i686-linux-gnu-
 TARGET:=i686-elf-
 #TARGET:=x86_64
 #TARGET:=aarch64
@@ -25,13 +25,18 @@ ifeq ($(HOST_KERNEL), Darwin)
 endif
 
 ifeq ($(HOST_KERNEL), Linux) 
+	NASM:=$(LINUX_PATH)nasm
+	GDB:=$(LINUX_PATH)gdb
 	ifeq ($(HOST_ARCH), x86_64)
-		ifeq ($(TARGET), i686-elf-)	# Host: Linux (x86_64), Target: i686 (32bits)
-		TOOL_PATH:=$(LINUX_PATH)$(TARGET)
-		NASM:=$(LINUX_PATH)nasm
+		ifeq ($(TARGET), i686-elf-)
+			# Host: Linux (x86_64), Target: i686 (32bits)
+			TOOL_PATH:=$(LINUX_PATH)$(TARGET)
 		endif
-		ifeq ($(HOST_ARCH), arm64)	# Host: Linux (arm64), Target: i686 (32bits)
-		TOOL_PATH:=$(LINUX_PATH)$(TARGET)-linux-gnu-
+	endif
+	ifeq ($(HOST_ARCH), aarch64)	
+		ifeq ($(TARGET), i686-elf-)
+			# Host: Linux (arm64), Target: i686 (32bits)
+			TOOL_PATH:=$(LINUX_ARM64_PATH)
 		endif
 	endif
 endif
