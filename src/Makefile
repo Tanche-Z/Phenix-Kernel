@@ -1,6 +1,6 @@
 SRC:=.
 TEST=./ph1nix_test
-BUILD:=./build
+BUILD:=../build
 TEST_BUILD:=$(TEST)/build
 BOCHS_CONFIG:=$(TEST)/bochs/config
 

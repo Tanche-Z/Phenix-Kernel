@@ -12,6 +12,4 @@
 build
 test/build
 bochsrc*
-ph1nix_doc
-ph1nix_test
 .vscode
