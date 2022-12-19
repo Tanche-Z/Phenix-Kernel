@@ -1,10 +1,10 @@
-**English | [简体中文](./README_zh_cn.md)**<br>
+**English | [简体中文](./src/docs/translations/zh_cn/README_zh_cn.md)**<br>
 [![License](https://img.shields.io/badge/License-MIT-blue)](https://github.com/HuayuZhangJager/ph1nix/blob/main/LICENSE.txt)
 [![GitHub release](https://img.shields.io/badge/Releases-Latest-brightgreen)](https://github.com/HuayuZhangJager/ph1nix/releases/latest)
 
 # ph1nix
 
-The kernel tree of ph1nix OS.
+ph1nix OS.
 
 ### <mark>To Do:<mark>
 
