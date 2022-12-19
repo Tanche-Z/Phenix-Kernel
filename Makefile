@@ -128,7 +128,11 @@ $(BUILD)/master.img: $(BUILD)/boot/boot.bin \
 	$(BUILD)/system.bin \
 	$(BUILD)/system.map
 
-	yes | bximage -q -hd=16 -func=create -sectsize=512 -imgmode=flat $@
+	if ($(HOST_KERNEL) == Linux);then \
+		yes | bximage -q -hd=16 -mode=create -sectsize=512 -imgmode=flat $@; \
+	elif ($(HOST_KERNEL) == Darwin);then \
+		yes | bximage -q -hd=16 -func=create -sectsize=512 -imgmode=flat $@; \
+	fi
 	dd if=$(BUILD)/boot/boot.bin of=$@ bs=512 count=1 conv=notrunc
 	dd if=$(BUILD)/boot/loader.bin of=$@ bs=512 count=4 seek=2 conv=notrunc
 	dd if=$(BUILD)/system.bin of=$@ bs=512 count=200 seek=10 conv=notrunc
