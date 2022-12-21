@@ -79,6 +79,12 @@ ph1nix OS.
   - nasm
   - qemu-system-x86
   - bochs
+- (Arch/Asahi) aur packages:
+  - i686-elf-gcc-aarch64 
+  - i686-elf-binutils-aarch64 
+  - bin86-aarch64 
+  - qemu-full-aarch64-git 
+  - bochs-gdb-stub 
 ## Linux (x86_64) 
 - (Debian) apt packages:
   - gcc-i686-linux-gnu
