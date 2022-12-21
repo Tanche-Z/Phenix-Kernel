@@ -7,11 +7,13 @@ BOCHS_CONFIG:=$(TEST)/bochs/config
 # Set cross compile tools chain
 HOME_BREW_ARM64_PATH:=/opt/homebrew/bin/
 LINUX_PATH:=/usr/bin/
+LINUX_LOCAL_PATH:=/usr/local/bin/
 TARGET:=i686
 #TARGET:=x86_64
 #TARGET:=aarch64
 HOST_ARCH:=$(shell uname -m)
 HOST_KERNEL:=$(shell uname -s)
+HOST_DISTRO:=$(shell uname -n)
 # Host: Apple Silicon Mac(arm64), Target: i686 (32bits)
 ifeq ($(HOST_KERNEL), Darwin)
 	ifeq ($(HOST_ARCH), arm64)
@@ -34,8 +36,15 @@ ifeq ($(HOST_KERNEL), Linux)
 	endif
 	ifeq ($(HOST_ARCH), aarch64)	
 		ifeq ($(TARGET), i686)
-			# Host: Linux (arm64), Target: i686 (32bits)
-			TOOL_PATH:=$(LINUX_PATH)$(TARGET)-linux-gnu-
+			ifeq ($(HOST_DISTRO), Asahi)
+				# Host: Linux (arm64), Target: i686 (32bits)
+				TOOL_PATH:=$(LINUX_LOCAL_PATH)$(TARGET)-linux-gnu-
+			endif
+			ifneq ($(HOST_DISTRO), Asahi)
+				# Host: Linux (arm64), Target: i686 (32bits)
+				TOOL_PATH:=$(LINUX_PATH)$(TARGET)-linux-gnu-
+			endif
+			
 		endif
 	endif
 endif
