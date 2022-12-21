@@ -38,7 +38,7 @@ ifeq ($(HOST_KERNEL), Linux)
 		ifeq ($(TARGET), i686)
 			ifeq ($(HOST_DISTRO), Asahi)
 				# Host: Linux (arm64), Target: i686 (32bits)
-				TOOL_PATH:=$(LINUX_LOCAL_PATH)$(TARGET)-linux-gnu-
+				TOOL_PATH:=$(LINUX_LOCAL_PATH)$(TARGET)-elf-
 			endif
 			ifneq ($(HOST_DISTRO), Asahi)
 				# Host: Linux (arm64), Target: i686 (32bits)
