@@ -86,9 +86,14 @@ ph1nix OS.
   - qemu-full-aarch64-git 
   - bochs-gdb-stub 
 ## Linux (x86_64) 
-- (Debian) apt packages:
-  - gcc-i686-linux-gnu
-  - binutils-i686-linux-gnu
-  - nasm
-  - qemu-system-x86
-  - bochs
+- (Arch) 
+  - pacman packages:
+    - nasm
+    - qemu-system-x86
+    - bochs
+  - aur packages:
+    - bochs-gdb-stub
+  - [compile](<tools/build-tool-chains/build-tool-chains-arch-linux-x86_64.md>):
+    - i686-elf-gcc
+    - i686-elf-binutils
+    - i686-elf-gdb
