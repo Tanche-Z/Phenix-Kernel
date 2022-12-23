@@ -31,7 +31,7 @@ ifeq ($(HOST_KERNEL), Linux)
 	ifeq ($(HOST_ARCH), x86_64)
 		ifeq ($(TARGET), i686)
 			# Host: Linux (x86_64), Target: i686 (32bits)
-			TOOL_PATH:=$(LINUX_PATH)$(TARGET)-linux-gnu-
+			TOOL_PATH:=$(LINUX_LOCAL_PATH)$(TARGET)-elf-
 		endif
 	endif
 	ifeq ($(HOST_ARCH), aarch64)	
