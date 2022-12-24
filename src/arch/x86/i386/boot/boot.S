@@ -14,12 +14,6 @@ _start:
     mov $booting, %si
     call print
 
-    // # Real mode addressing:
-    // # effective addr = segment addr * 16 + excursion addr
-    // mov $0xb800, %ax
-    // mov %ax, %ds
-    // movb $0x48, 0 # print `H`
-
     movl $0x1000, %edi # read target mem
     movl $2, %ecx # start sector
     mov $4, %bl # sector count

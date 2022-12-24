@@ -12,10 +12,6 @@ mov sp, 0x7c00 ; MBR Load into this address after find magic number of 0x55, 0xA
 mov si, booting
 call print
 
-; mov ax, 0xb800
-; mov ds, ax
-; mov byte [0], 'H'
-
 mov edi, 0x1000; read target memory
 mov ecx, 2; start sector
 mov bl, 4; sector count
