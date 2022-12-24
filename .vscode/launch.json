@@ -25,8 +25,8 @@
                     "ignoreFailures": true
                 }
             ],
-            // "miDebuggerPath": "/usr/bin/gdb" // for x86_64 env debugging
-            "miDebuggerPath": "/usr/bin/i686-elf-gdb" // for x86_64 env debugging
+            "miDebuggerPath": "/usr/bin/gdb" // for x86_64 env debugging
+            // "miDebuggerPath": "/usr/local/bin/i686-elf-gdb" // for x86_64 env debugging
             //"miDebuggerPath": "/opt/homebrew/bin/i386-elf-gdb" // for m1 Mac (arch64) env debugging
         },
         // {
@@ -43,80 +43,80 @@
         //     //"miDebuggerServerAddress": "localhost:1234", // default gdb port for qemu and was set in bochsrc_gdb file
         //     //"miDebuggerPath": "/usr/bin/lldb"
         // },
-        {
-            "name": "test gdb_c",
-            "type": "cppdbg",
-            "request": "launch",
-            "program": "${workspaceFolder}/build/test_debug/${fileBasenameNoExtension}.out",
-            "args": [],
-            "stopAtEntry": false,
-            "cwd": "${fileDirname}",
-            "environment": [],
-            "externalConsole": false,
-            "MIMode": "gdb",
-            "setupCommands": [
-                {
-                    "description": "Enable pretty-printing for gdb",
-                    "text": "-enable-pretty-printing",
-                    "ignoreFailures": true
-                },
-                {
-                    "description":  "Set Disassembly Flavor to Intel",
-                    "text": "-gdb-set disassembly-flavor intel",
-                    "ignoreFailures": true
-                }
-            ],
-            "preLaunchTask": "C/C++: gcc build active file",
-            "miDebuggerPath": "/usr/bin/gdb"
-        },
-        {
-            "name": "test gdb_nasm",
-            "type": "cppdbg",
-            "request": "launch",
-            "program": "${workspaceFolder}/build/test_debug/${fileBasenameNoExtension}.out",
-            "args": [],
-            "stopAtEntry": false,
-            "cwd": "${fileDirname}",
-            "environment": [],
-            "externalConsole": false,
-            "MIMode": "gdb",
-            "setupCommands": [
-                {
-                    "description": "Enable pretty-printing for gdb",
-                    "text": "-enable-pretty-printing",
-                    "ignoreFailures": true
-                },
-                {
-                    "description":  "Set Disassembly Flavor to Intel",
-                    "text": "-gdb-set disassembly-flavor intel",
-                    "ignoreFailures": true
-                }
-            ],
-            "preLaunchTask": "nasm: gcc build active file",
-            "miDebuggerPath": "/usr/bin/gdb"
-        },
-        {
-            "name": "test lldb_c", // LLDB debugging require CodeLLDB extention which can find in VScode Marketplace
-            "type": "lldb",
-            "request": "launch",
-            "program": "${fileDirname}/${fileBasenameNoExtension}.out",
-            "args": [],
-            "cwd": "${fileDirname}",
-            // "MIMode": "lldb",
-            "preLaunchTask": "C/C++: clang build active file",
-            // "miDebuggerPath": "/usr/bin/lldb"
-        },
-        {
-            "name": "test lldb_nasm", // LLDB debugging require CodeLLDB extention which can find in VScode Marketplace
-            "type": "lldb",
-            "request": "launch",
-            "program": "${fileDirname}/${fileBasenameNoExtension}.out",
-            "args": [],
-            "cwd": "${fileDirname}",
-            // "MIMode": "lldb",
-            "preLaunchTask": "nasm: clang build active file",
-            // "miDebuggerPath": "/usr/bin/lldb"
-        },
+        // {
+        //     "name": "test gdb_c",
+        //     "type": "cppdbg",
+        //     "request": "launch",
+        //     "program": "${workspaceFolder}/build/test_debug/${fileBasenameNoExtension}.out",
+        //     "args": [],
+        //     "stopAtEntry": false,
+        //     "cwd": "${fileDirname}",
+        //     "environment": [],
+        //     "externalConsole": false,
+        //     "MIMode": "gdb",
+        //     "setupCommands": [
+        //         {
+        //             "description": "Enable pretty-printing for gdb",
+        //             "text": "-enable-pretty-printing",
+        //             "ignoreFailures": true
+        //         },
+        //         {
+        //             "description":  "Set Disassembly Flavor to Intel",
+        //             "text": "-gdb-set disassembly-flavor intel",
+        //             "ignoreFailures": true
+        //         }
+        //     ],
+        //     "preLaunchTask": "C/C++: gcc build active file",
+        //     "miDebuggerPath": "/usr/bin/gdb"
+        // },
+        // {
+        //     "name": "test gdb_nasm",
+        //     "type": "cppdbg",
+        //     "request": "launch",
+        //     "program": "${workspaceFolder}/build/test_debug/${fileBasenameNoExtension}.out",
+        //     "args": [],
+        //     "stopAtEntry": false,
+        //     "cwd": "${fileDirname}",
+        //     "environment": [],
+        //     "externalConsole": false,
+        //     "MIMode": "gdb",
+        //     "setupCommands": [
+        //         {
+        //             "description": "Enable pretty-printing for gdb",
+        //             "text": "-enable-pretty-printing",
+        //             "ignoreFailures": true
+        //         },
+        //         {
+        //             "description":  "Set Disassembly Flavor to Intel",
+        //             "text": "-gdb-set disassembly-flavor intel",
+        //             "ignoreFailures": true
+        //         }
+        //     ],
+        //     "preLaunchTask": "nasm: gcc build active file",
+        //     "miDebuggerPath": "/usr/bin/gdb"
+        // },
+        // {
+        //     "name": "test lldb_c", // LLDB debugging require CodeLLDB extention which can find in VScode Marketplace
+        //     "type": "lldb",
+        //     "request": "launch",
+        //     "program": "${fileDirname}/${fileBasenameNoExtension}.out",
+        //     "args": [],
+        //     "cwd": "${fileDirname}",
+        //     // "MIMode": "lldb",
+        //     "preLaunchTask": "C/C++: clang build active file",
+        //     // "miDebuggerPath": "/usr/bin/lldb"
+        // },
+        // {
+        //     "name": "test lldb_nasm", // LLDB debugging require CodeLLDB extention which can find in VScode Marketplace
+        //     "type": "lldb",
+        //     "request": "launch",
+        //     "program": "${fileDirname}/${fileBasenameNoExtension}.out",
+        //     "args": [],
+        //     "cwd": "${fileDirname}",
+        //     // "MIMode": "lldb",
+        //     "preLaunchTask": "nasm: clang build active file",
+        //     // "miDebuggerPath": "/usr/bin/lldb"
+        // },
 
     ]
 }

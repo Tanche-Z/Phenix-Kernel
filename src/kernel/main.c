@@ -8,12 +8,12 @@
 
 void _kernel_init()
 {
-    console_init();
-    int cnt =30 ;
-    while (cnt--)
-    {
-        printk("hello ph1nix %#010x\n", cnt);
-    }
+    // console_init();
+    // int cnt =30 ;
+    // while (cnt--)
+    // {
+    //     printk("hello ph1nix %#010x\n", cnt);
+    // }
 
     return;
 }
