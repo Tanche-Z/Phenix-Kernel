@@ -49,9 +49,9 @@ ph1nix OS.
 
   - [ ] c/c++
 
-- [ ] GUI (C++) (Dragon DE)
+- [ ] GUI (C++)
 
-- [ ] Developing APIs
+- [ ] Developing Other APIs
 
 - [ ] Mass migration of software (sperate repo)
 
@@ -60,7 +60,7 @@ ph1nix OS.
   - [ ] gnu toolchain
   - [ ] llvm
   - [ ] Rust
-  - [ ] DE (kde/xfce/gnome)
+  - [ ] Free DEs (kde/xfce/gnome)
 ---
 
 # Current Dev Env
