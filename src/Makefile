@@ -32,6 +32,7 @@ ifeq ($(HOST_KERNEL), Linux)
 		ifeq ($(TARGET), i686)
 			# Host: Linux (x86_64), Target: i686 (32bits)
 			TOOL_PATH:=$(LINUX_LOCAL_PATH)$(TARGET)-elf-
+			GDB:=$(LINUX_LOCAL_PATH)$(TARGET)-elf-gdb
 		endif
 	endif
 	ifeq ($(HOST_ARCH), aarch64)	
