@@ -9,29 +9,30 @@ BOCHS_CONFIG:=$(TOOLS)/bochs-config
 HOME_BREW_ARM64_PATH:=/opt/homebrew/bin/
 LINUX_PATH:=/usr/bin/
 LINUX_LOCAL_PATH:=/usr/local/bin/
-TARGET_ARCH:=x86
-TARGET:=i386
-#TARGET:=x86_64
-#TARGET:=aarch64
+#TARGET_ARCH:=x86
+TARGET_ARCH:=i386
+#TARGET_ARCH:=x86_64
+#TARGET_ARCH:=aarch64
+
+# building host config
 HOST_ARCH:=$(shell uname -m)
 HOST_KERNEL:=$(shell uname -s)
 HOST_DISTRO:=$(shell uname -n)
+
 # Host: Apple Silicon Mac(arm64), Target: i686 (32bits)
 ifeq ($(HOST_KERNEL), Darwin)
 	ifeq ($(HOST_ARCH), arm64)
-		ifeq ($(TARGET), i386)
+		ifeq ($(TARGET_ARCH), i386)
 		TOOL_PATH:=$(HOME_BREW_ARM64_PATH)$(TARGET)-elf-
-		NASM:=$(HOME_BREW_ARM64_PATH)nasm
 		GDB:=$(HOME_BREW_ARM64_PATH)i386-elf-gdb
 		endif
 	endif
 endif
 
 ifeq ($(HOST_KERNEL), Linux) 
-	NASM:=$(LINUX_PATH)nasm
 	GDB:=$(LINUX_PATH)gdb
 	ifeq ($(HOST_ARCH), x86_64)
-		ifeq ($(TARGET), i386)
+		ifeq ($(TARGET_ARCH), i386)
 			# Host: Linux (x86_64), Target: i386 (32bits)
 			# TOOL_PATH:=$(LINUX_LOCAL_PATH)i686-elf-
 			# GDB:=$(LINUX_LOCAL_PATH)i686-elf-gdb
@@ -39,7 +40,7 @@ ifeq ($(HOST_KERNEL), Linux)
 		endif
 	endif
 	ifeq ($(HOST_ARCH), aarch64)	
-		ifeq ($(TARGET), i386)
+		ifeq ($(TARGET_ARCH), i386)
 			ifeq ($(HOST_DISTRO), Asahi)
 				# Host: Linux (arm64), Target: i386 (32bits)
 				TOOL_PATH:=$(LINUX_LOCAL_PATH)i686-elf-
@@ -63,13 +64,13 @@ OBJDUMP:=$(TOOL_PATH)objdump
 show_config:
 	$(info $$HOST_ARCH = ${HOST_ARCH})
 	$(info $$HOST_KERNEL = ${HOST_KERNEL})
+	$(info $$TARGET_ARCH = ${TARGET_ARCH})
 	$(info $$AS = ${AS})
 	$(info $$LD = ${LD})
 	$(info $$CC = ${CC})
 	$(info $$OBJCOPY = ${OBJCOPY})
 	$(info $$OBJDUMP = ${OBJDUMP})
 	$(info $$GDB = ${GDB})
-	$(info $$NASM = ${NASM})
 
 CFLAGS:= -fno-builtin # no built-in function in gcc
 CFLAGS+= -fno-pic # no position independent code
