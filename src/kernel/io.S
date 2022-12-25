@@ -5,12 +5,13 @@
 .global inb
 inb:
     push %ebp
-    mov %esp, %ebp
+    mov %esp, %ebp # save frame
 
-    xor %eax, %eax
-    mov 0x8(%ebp), %edx
-    in (%dx), %al
+    xor %eax, %eax # clean out eax
+    mov 0x8(%ebp), %edx # port
+    in (%dx), %al # input 8 bits from port `dx` into `al`
 
+    # add some delay...
     jmp .+2
     jmp .+2
     jmp .+2
