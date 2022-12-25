@@ -1,8 +1,8 @@
 SRC:=.
-#TEST=./ph1nix_test
+TEST=../tests
 BUILD:=../build
 TOOLS:=../tools
-#TEST_BUILD:=$(TEST)/build
+TEST_BUILD:=$(TEST)/build
 BOCHS_CONFIG:=$(TOOLS)/bochs-config
 
 # Set cross compile tools chain
@@ -94,15 +94,6 @@ INCLUDE:= -I $(SRC)/include/
 
 BOOT:=arch/$(TARGET_ARCH)/$(TARGET)/boot/
 
-# $(BUILD)/$(BOOT)%.bin: $(SRC)/$(BOOT)%.asm
-# 	$(shell mkdir -p $(dir $@))
-# 	$(NASM) -f bin $< -o $@
-
-# $(BUILD)/%.o: $(SRC)/%.asm
-# 	$(shell mkdir -p $(dir $@))
-# 	$(NASM) -f elf32 -gdwarf $< -o $@
-
-# change assembler from NASM to GNU AS(x86)
 $(BUILD)/$(BOOT)boot.bin: $(SRC)/$(BOOT)boot.S
 	$(shell mkdir -p $(dir $@))
 	$(AS) --32 $(DEBUG) $< -o $@.o
@@ -125,9 +116,9 @@ $(BUILD)/%.o: $(SRC)/%.c
 
 $(BUILD)/kernel.bin: \
 	$(BUILD)/kernel/start.o \
-	$(BUILD)/kernel/main.o
-
-# 	# $(BUILD)/kernel/io.o \
+	$(BUILD)/kernel/main.o \
+	$(BUILD)/kernel/io.o
+	
 # 	# $(BUILD)/kernel/console.o \
 # 	# $(BUILD)/kernel/printk.o \
 # 	# $(BUILD)/lib/string.o \
@@ -146,13 +137,6 @@ $(BUILD)/master.img: $(BUILD)/$(BOOT)boot.bin \
 	$(BUILD)/$(BOOT)loader.bin \
 	$(BUILD)/system.bin \
 	$(BUILD)/system.map
-
-# # choosing different version of bximage in Debian like distro (if using newer version like in Arch, no need)
-# if [ $(HOST_KERNEL) == "Linux" ];then \
-# 	yes | bximage -q -hd=16 -mode=create -sectsize=512 -imgmode=flat $@; \
-# elif [ $(HOST_KERNEL) == "Darwin" ];then \
-# 	yes | bximage -q -hd=16 -func=create -sectsize=512 -imgmode=flat $@; \
-# fi
 
 # yes | bximage -q -func=create -hd=16  -sectsize=512 -imgmode=flat $@
 
@@ -207,30 +191,30 @@ $(BUILD)/master.vdi: $(BUILD)/master.img
 .PHONY: vdi
 vdi: $(BUILD)/master.vdi
 
-# # for testing image in usb drive in virtualbox before going physic machine test
-# # should manually set path for IDE disk of usb.vmdk for usb test in virtualbox
-# .PHONY: vbox_usb_test
-# vbox_usb_test: usb
-# 	sudo vboxmanage internalcommands createrawvmdk -filename $(BUILD)/usb.vmdk -rawdisk /dev/sda; \
-# 	sudo chown kali:kali $(BUILD)/usb.vmdk
+# for testing image in usb drive in virtualbox before going physic machine test
+# should manually set path for IDE disk of usb.vmdk for usb test in virtualbox
+.PHONY: vbox_usb_test
+vbox_usb_test: usb
+	sudo vboxmanage internalcommands createrawvmdk -filename $(BUILD)/usb.vmdk -rawdisk /dev/sda; \
+	sudo chown kali:kali $(BUILD)/usb.vmdk
 
-# .PHONY: usb # sample code for write image to USB device
-# usb: $(BUILD)/master.img /dev/sda
-# 	# sudo dd if=/dev/sda of=$(BUILD)/boot/tmp.bin bs=512 count=1000 conv=notrunc
-# 	# cp $(BUILD)/boot/tmp.bin $(BUILD)/boot/usb.bin
-# 	# sudo rm $(BUILD)/boot/tmp.bin
-# 	# dd if=$(BUILD)/master.img of=$(BUILD)/boot/usb.bin bs=512 count=1000 conv=notrunc
-# 	# sudo dd if=$(BUILD)/boot/usb.bin of=/dev/sda bs=512 count=1000 conv=notrunc
-# 	# rm $(BUILD)/boot/usb.bin
+.PHONY: usb # sample code for write image to USB device
+usb: $(BUILD)/master.img /dev/sda
+	# sudo dd if=/dev/sda of=$(BUILD)/boot/tmp.bin bs=512 count=1000 conv=notrunc
+	# cp $(BUILD)/boot/tmp.bin $(BUILD)/boot/usb.bin
+	# sudo rm $(BUILD)/boot/tmp.bin
+	# dd if=$(BUILD)/master.img of=$(BUILD)/boot/usb.bin bs=512 count=1000 conv=notrunc
+	# sudo dd if=$(BUILD)/boot/usb.bin of=/dev/sda bs=512 count=1000 conv=notrunc
+	# rm $(BUILD)/boot/usb.bin
 
-# 	# sudo dd if=/dev/sda of=$(BUILD)/boot/tmp.bin bs=512 conv=notrunc
-# 	# cp $(BUILD)/boot/tmp.bin $(BUILD)/boot/usb.bin
-# 	# sudo rm $(BUILD)/boot/tmp.bin
-# 	# dd if=$(BUILD)/master.img of=$(BUILD)/boot/usb.bin bs=512 conv=notrunc
-# 	# sudo dd if=$(BUILD)/boot/usb.bin of=/dev/sda bs=512 conv=notrunc
-# 	# rm $(BUILD)/boot/usb.bin
+	# sudo dd if=/dev/sda of=$(BUILD)/boot/tmp.bin bs=512 conv=notrunc
+	# cp $(BUILD)/boot/tmp.bin $(BUILD)/boot/usb.bin
+	# sudo rm $(BUILD)/boot/tmp.bin
+	# dd if=$(BUILD)/master.img of=$(BUILD)/boot/usb.bin bs=512 conv=notrunc
+	# sudo dd if=$(BUILD)/boot/usb.bin of=/dev/sda bs=512 conv=notrunc
+	# rm $(BUILD)/boot/usb.bin
 
-# 	dd if=$(BUILD)/master.img of=/dev/sda
+	sudo dd if=$(BUILD)/master.img of=/dev/sda
 
 .PHONY: test
 test: $(BUILD)/master.img

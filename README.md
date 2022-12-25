@@ -27,7 +27,7 @@ ph1nix OS.
 
 - [ ] Network Stack (TCP/IP)
 
-- [ ] NASM to GNU AS
+- [x] NASM to GNU AS
 
 - [ ] i686 to x86_64
 
@@ -53,7 +53,7 @@ ph1nix OS.
 
 - [ ] Developing Other APIs
 
-- [ ] Mass migration of software (sperate repo)
+- [ ] Massive porting jobs of software (sperate repo? maybe)
 
   - [ ] bash/zsh
   - [ ] vim
@@ -68,7 +68,6 @@ ph1nix OS.
 - Homebrew packages:
   - i686-elf-gcc
   - i686-elf-binutils
-  - nasm
   - qemu
   - bochs
 ## Linux (aarch64) 
@@ -76,19 +75,17 @@ ph1nix OS.
   - gcc-i686-linux-gnu
   - binutils-i686-linux-gnu
   - i386-elf-gdb
-  - nasm
   - qemu-system-x86
   - bochs
 - (Arch/Asahi) aur packages:
   - i686-elf-gcc-aarch64 
   - i686-elf-binutils-aarch64 
-  - bin86-aarch64 
+  - (bin86-aarch64) (optional)
   - qemu-full-aarch64-git 
   - bochs-gdb-stub 
 ## Linux (x86_64) 
 - (Arch) 
   - pacman packages:
-    - nasm
     - qemu-system-x86
     - bochs
   - aur packages:
