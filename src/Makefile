@@ -33,9 +33,9 @@ ifeq ($(HOST_KERNEL), Linux)
 	ifeq ($(HOST_ARCH), x86_64)
 		ifeq ($(TARGET), i386)
 			# Host: Linux (x86_64), Target: i386 (32bits)
-			TOOL_PATH:=$(LINUX_LOCAL_PATH)i686-elf-
-			GDB:=$(LINUX_LOCAL_PATH)i686-elf-gdb
-			# TOOL_PATH:=$(LINUX_PATH)
+			# TOOL_PATH:=$(LINUX_LOCAL_PATH)i686-elf-
+			# GDB:=$(LINUX_LOCAL_PATH)i686-elf-gdb
+			TOOL_PATH:=$(LINUX_PATH)
 		endif
 	endif
 	ifeq ($(HOST_ARCH), aarch64)	
@@ -79,8 +79,8 @@ CFLAGS+= -fno-stack-protector # no stack protector
 CFLAGS+= -nostdinc # no standard c header
 CFLAGS+= -nostdinc++ # no standard c++ header
 CFLAGS+= -nostdlib # no standard library
-# CFLAGS+= -m32 # (when using gcc target x86_64) i386 mode
-CFLAGS+= -Wa,--32 # (when using i686 gcc) pass option to assembler (generate 32bits code)
+CFLAGS+= -m32 # (when using gcc target x86_64) i386 mode
+# CFLAGS+= -Wa,--32 # (when using i686 gcc) pass option to assembler (generate 32bits code)
 CFLAGS:=$(strip ${CFLAGS})
 
 BOOT_EP:=0x7c00
@@ -90,7 +90,9 @@ KERNEL_EP:=0x10000
 DEBUG:= -g
 INCLUDE:= -I $(SRC)/include/
 
-# $(BUILD)/boot/%.bin: $(SRC)/boot/%.asm
+BOOT:=arch/$(TARGET_ARCH)/$(TARGET)/boot/
+
+# $(BUILD)/$(BOOT)%.bin: $(SRC)/$(BOOT)%.asm
 # 	$(shell mkdir -p $(dir $@))
 # 	$(NASM) -f bin $< -o $@
 
@@ -98,18 +100,16 @@ INCLUDE:= -I $(SRC)/include/
 # 	$(shell mkdir -p $(dir $@))
 # 	$(NASM) -f elf32 -gdwarf $< -o $@
 
-BOOT:=arch/$(TARGET_ARCH)/$(TARGET)/boot/
-
 # change assembler from NASM to GNU AS(x86)
 $(BUILD)/$(BOOT)boot.bin: $(SRC)/$(BOOT)boot.S
 	$(shell mkdir -p $(dir $@))
-	$(AS) --gdwarf-5 $< -o $@.o
+	$(AS) --32 --gdwarf-5 $< -o $@.o
 	$(LD) -m elf_i386 -static $@.o -o $@.elf -Ttext $(BOOT_EP)
 	$(OBJCOPY) -O binary $@.elf $@
 
 $(BUILD)/$(BOOT)loader.bin: $(SRC)/$(BOOT)loader.S
 	$(shell mkdir -p $(dir $@))
-	$(AS) --gdwarf-5 $< -o $@.o
+	$(AS) --32 --gdwarf-5 $< -o $@.o
 	$(LD) -m elf_i386 -static $@.o -o $@.elf -Ttext $(LOADER_EP)
 	$(OBJCOPY) -O binary $@.elf $@
 

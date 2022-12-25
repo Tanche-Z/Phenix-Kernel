@@ -193,11 +193,11 @@ error:
     error_msg:
     .asciz "Booting Error!!!\n\r"
 
-// # 512-2=510 total size minus last two bytes
-// # 510-size of previews code (fill with 0)
-// .space 510 -(. - _start) ,0
+# 512-2=510 total size minus last two bytes
+# 510-size of previews code (fill with 0)
+.space 510 -(. - _start) ,0
 
-. = _start + 510
+// . = _start + 510
 
 # last 2 bytes in MBR (2 Byts = 1 Word = 16 Bits)
 .word 0xaa55

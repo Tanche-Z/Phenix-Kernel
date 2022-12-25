@@ -175,17 +175,17 @@ read_disk:
 ;             loop .writew
 ;         ret
 
-; print:
-;     mov ah, 0x0e
-; .next:
-;     mov al, [si]
-;     cmp al, 0
-;     jz .done
-;     int 0x10
-;     inc si
-;     jmp .next
-; .done:
-;     ret
+print:
+    mov ah, 0x0e
+.next:
+    mov al, [si]
+    cmp al, 0
+    jz .done
+    int 0x10
+    inc si
+    jmp .next
+.done:
+    ret
 
 
 booting:

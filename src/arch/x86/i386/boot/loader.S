@@ -1,10 +1,10 @@
 // .text
-.code16
+    .code16
 .global _start
 _start:
 .word 0x55aa # magic for Error judgement
 
-# indicating entered boot loader
+# indicating has entered boot loader
 mov $loading, %si
 call print
 
@@ -17,34 +17,50 @@ detect_memory:
     mov %ax, %es
     mov $ards_buffer, %edi
 
-    mov $0x534d4150, %edx
+    mov $0x534d4150, %edx # a fix signiture (ASCII for `SMAP`)
 
 .next:
     # number of subfuction of BIOS (Memory detecting)
     mov $0xe820, %eax
-    # ards the size of structure (in bytes)
+    # the size of ARDS structure (in bytes)
     mov $20, %ecx
     # system call 0x15
     int $0x15
 
-    # Output Error if CF=0
+    # Output Error if CF=1
     jc error
 
-    # let cache pointer point to next structure
+    # let cache pointer point to next structure body
     add %cx, %di
 
     # add 1 to count of structural body
-    incw ards_count
+    incl ards_count
 
     cmp $0, %ebx
     jnz .next
 
+    # finished detecting memory
     mov $detecting, %si
     call print
+
+    mov ards_count, %cx
+    mov $0, %si
+
+// # show ARDS ???
+// .show:
+//     mov $ards_buffer, %bx
+//     mov %si, %ax
+//     add %ax, %bx
+//     mov (%bx), %ax
+
+//     xchg %bx, %bx
+//     loop .show
 
     jmp pre_protected_mode
 
 pre_protected_mode:
+    xchg %bx, %bx
+
     cli # clear interrupt
     # open the A20
     in $0x92, %al
@@ -57,6 +73,7 @@ pre_protected_mode:
     mov %eax, %cr0
     ljmp $code_selector, $protect_mode # use jmp to refresh cache
 
+# pirnt in Real Mode
 print:
     mov $0x0e, %ah
 .p_next:
@@ -72,7 +89,7 @@ print:
 loading:
     .asciz "Loading ph1nix...\n\r"
 detecting:
-    .asciz "Detecting Memory Success...\n\r"
+    .asciz "Detecting Memory Success ^_^\n\r"
 
 error:
     mov $.msg, %si
@@ -82,7 +99,10 @@ error:
     .msg:
         .asciz "Loading Error!!!\n\r"
 
-.code32
+
+// code bening trunc!!! No high bits
+// why???
+    .code32
 protect_mode:
     mov $data_selector, %ax
     mov %ax, %ds
@@ -91,86 +111,91 @@ protect_mode:
     mov %ax, %gs
     mov %ax, %ss # initialize segment register
 
-    mov $0x10000, %esp # set stack top
+// code bening trunc!!! No high bits
+    movl $0x10000, %esp # set stack top
 
-    mov $0x10000, %edi # read target memory
-    mov $10, %ecx # start sector
-    mov $200, %bl # sector count
-    call read_disk
+    movl $0x50, 0xb8000
+    movl $0x50, 0x200000
 
-    ljmp $code_selector, $0x10000
-    ud2 # means error occur
+    // mov $0x10000, %edi # read target memory
+//     mov $10, %ecx # start sector
+//     mov $200, %bl # sector count
+//     call read_disk
+
+//     ljmp $code_selector, $0x10000
+//     ud2 # means error occur
+
 jmp .
 
-read_disk:
+// read_disk:
 
-    mov $0x1f2, %dx
-    mov %bl, %al
-    out %al, (%dx)
+//     mov $0x1f2, %dx
+//     mov %bl, %al
+//     out %al, (%dx)
 
-    inc %dx # 0x1f3
-    mov %cl, %al
-    out %al, (%dx)
+//     inc %dx # 0x1f3
+//     mov %cl, %al
+//     out %al, (%dx)
 
-    inc %dx # 0x1f4
-    shr $8, %ecx
-    mov %cl, %al
-    out %al, (%dx)
+//     inc %dx # 0x1f4
+//     shr $8, %ecx
+//     mov %cl, %al
+//     out %al, (%dx)
 
-    inc %dx # 0x1f5
-    shr $8, %ecx
-    mov %cl, %al # the high 8 bits of start sector
-    out %al, (%dx)
+//     inc %dx # 0x1f5
+//     shr $8, %ecx
+//     mov %cl, %al # the high 8 bits of start sector
+//     out %al, (%dx)
 
-    inc %dx # 0x1f6
-    shr $8, %ecx
-    and $0b1111, %cl # set the high 4 bits as 0
+//     inc %dx # 0x1f6
+//     shr $8, %ecx
+//     and $0b1111, %cl # set the high 4 bits as 0
 
-    mov $0b11100000, %al
-    or %cl, %al
-    out %al, (%dx) # LBA mode
+//     mov $0b11100000, %al
+//     or %cl, %al
+//     out %al, (%dx) # LBA mode
 
-    inc %dx # 0x1f7
-    mov $0x20, %al
-    out %al, (%dx)
+//     inc %dx # 0x1f7
+//     mov $0x20, %al
+//     out %al, (%dx)
 
-    xor %ecx, %ecx # clear ECX
+//     xor %ecx, %ecx # clear ECX
 
-    mov %bl, %cl # get the count of read/write sectors
+//     mov %bl, %cl # get the count of read/write sectors
 
-    .read:
-        push %cx
-        call .waits
-        call .reads
-        pop %cx
-        loop .read
+//     .read:
+//         push %cx
+//         call .waits
+//         call .reads
+//         pop %cx
+//         loop .read
 
-    ret
+//     ret
 
-    .waits:
-        mov $0x1f7, %dx
-        .check:
-        in (%dx), %al
-        jmp .+2 # jump to next line
-        jmp .+2
-        jmp .+2
-        and $0b10001000, %al
-        cmp $0b00001000, %al
-        jnz .check
-    ret
+//     .waits:
+//         mov $0x1f7, %dx
+//         .check:
+//         in (%dx), %al
+//         jmp .+2 # jump to next line
+//         jmp .+2
+//         jmp .+2
+//         and $0b10001000, %al
+//         cmp $0b00001000, %al
+//         jnz .check
+//     ret
 
-    .reads:
-        mov $0x1f0, %dx
-        mov $256, %cx
-        .readw:
-            in (%dx), %ax
-            jmp .+2
-            jmp .+2
-            jmp .+2
-            mov %ax, (%edi)
-            add $2, %edi
-            loop .readw
-        ret
+//     .reads:
+//         mov $0x1f0, %dx
+//         mov $256, %cx
+//         .readw:
+//             in (%dx), %ax
+//             jmp .+2
+//             jmp .+2
+//             jmp .+2
+//             mov %ax, (%edi)
+//             add $2, %edi
+//             loop .readw
+//         ret
 
 .equ code_selector, (1 << 3)
 .equ data_selector, (2 << 3)
@@ -187,7 +212,7 @@ gdt_code:
     .word memory_limit & 0xffff # segment limit 0~15
     .word memory_base & 0xffff # base address 0~15
     .byte (memory_base >> 16) & 0xff # base address 16~23
-    .byte 0b10011010 # exist_dpl(discriptor privilege level) is 0_S is Code_ NOT compliance_writable_haven't been accessed
+    .byte 0b10011010 # exist_dpl(discriptor privilege level) is 0_S is Code_ NOT compliance_readable_haven't been accessed
     .byte 0b11000000 | (memory_limit >> 16) & 0xf # 4K_32bit_not 64bit_available to OS_segment limit 16~19
     .byte (memory_base >> 24) & 0xff # base address 24~31
 

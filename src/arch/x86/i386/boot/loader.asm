@@ -25,14 +25,14 @@ detect_memory:
     ; system call 0x15
     int 0x15
 
-    ; Error occurred if CF = 0
+    ; Error occurred if CF = 1
     jc error
 
     ; let cache pointer point to next structure
     add di, cx
 
     ; add 1 to count of structural body
-    inc word [ards_count]
+    inc dword [ards_count]
 
     cmp ebx, 0
     jnz .next
@@ -40,9 +40,23 @@ detect_memory:
     mov si, detecting
     call print
 
+    mov cx, [ards_count]
+    mov si, 0
+
+    ; ; show ARDS
+    ; .show:
+    ;     mov eax, [ards_buffer + si]
+    ;     mov ebx, [ards_buffer + si + 8]
+    ;     mov edx, [ards_buffer + si + 16]
+    ;     add si, 20
+    ;     xchg bx, bx
+    ;     loop .show
+
     jmp pre_protected_mode
 
 pre_protected_mode:
+    xchg bx, bx
+
     cli ; clear interrupt
     ; open A20
     in al, 0x92
@@ -55,6 +69,7 @@ pre_protected_mode:
     mov cr0 , eax
     jmp dword code_selector:protect_mode ; use jmp to refresh cache
 
+; print in Real Mode
 print:
     mov ah, 0x0e
 .next:
@@ -66,7 +81,6 @@ print:
     jmp .next
 .done:
     ret
-
 
 loading:
     db "Loading ph1nix...", 10, 13, 0;\n\r
@@ -82,6 +96,8 @@ error:
 
 [bits 32]
 protect_mode:
+    xchg bx, bx
+
     mov ax, data_selector
     mov ds, ax
     mov es, ax
@@ -91,86 +107,89 @@ protect_mode:
 
     mov esp, 0x10000 ; modify stack top
 
-    mov edi, 0x10000 ; read target memory
-    mov ecx, 10; start sector
-    mov bl, 200; sector count
-    call read_disk
+    mov byte [0xb8000], 'P' ; indicate protected mode
+    mov byte [0x200000], 'P' ; indicate protected mode (about 2M)
 
-    jmp code_selector:0x10000
-    ud2; means error occur
+    ; mov edi, 0x10000 ; read target memory
+;     mov ecx, 10; start sector
+;     mov bl, 200; sector count
+;     call read_disk
+
+;     jmp code_selector:0x10000
+;     ud2; means error occur
 jmp $
 
-read_disk:
+; read_disk:
 
-    ; set the number of reading/writing sectors
-    mov dx, 0x1f2
-    mov al, bl
-    out dx, al
+;     ; set the number of reading/writing sectors
+;     mov dx, 0x1f2
+;     mov al, bl
+;     out dx, al
     
-    inc dx; 0x1f3
-    mov al, cl; the low 8 bits of start sector 
-    out dx, al
+;     inc dx; 0x1f3
+;     mov al, cl; the low 8 bits of start sector 
+;     out dx, al
 
-    inc dx; 0x1f4
-    shr ecx, 8
-    mov al, cl
-    out dx, al
+;     inc dx; 0x1f4
+;     shr ecx, 8
+;     mov al, cl
+;     out dx, al
 
-    inc dx; 0x1f5
-    shr ecx, 8
-    mov al, cl; the high 8 bits of start sector 
-    out dx, al
+;     inc dx; 0x1f5
+;     shr ecx, 8
+;     mov al, cl; the high 8 bits of start sector 
+;     out dx, al
 
-    inc dx; 0x1f6
-    shr ecx, 8
-    and cl, 0b1111; set high 4 bit as 0
+;     inc dx; 0x1f6
+;     shr ecx, 8
+;     and cl, 0b1111; set high 4 bit as 0
 
-    mov al, 0b1110_0000;
-    or al, cl
-    out dx, al ;LBA mdoe
+;     mov al, 0b1110_0000;
+;     or al, cl
+;     out dx, al ;LBA mdoe
 
-    inc dx; 0x1f7
-    mov al, 0x20 ; read hard disk
-    out dx, al
+;     inc dx; 0x1f7
+;     mov al, 0x20 ; read hard disk
+;     out dx, al
 
-    xor ecx, ecx; clear ecx
-    ;mov ecx, 0
+;     xor ecx, ecx; clear ecx
+;     ;mov ecx, 0
 
-    mov cl, bl ; get the count of read/write sectors
+;     mov cl, bl ; get the count of read/write sectors
 
-    .read:
-        push cx; store cx
-        call .waits;wait for data ready
-        call .reads; read a sector
-        pop cx; restore xc
-        loop .read
+;     .read:
+;         push cx; store cx
+;         call .waits;wait for data ready
+;         call .reads; read a sector
+;         pop cx; restore xc
+;         loop .read
 
-    ret
+;     ret
 
-    .waits:
-        mov dx, 0x1f7
-        .check:
-            in al, dx
-            jmp $+2;jump to next line
-            jmp $+2
-            jmp $+2
-            and al, 0b1000_1000
-            cmp al, 0b0000_1000
-            jnz .check
-        ret
+;     .waits:
+;         mov dx, 0x1f7
+;         .check:
+;             in al, dx
+;             jmp $+2;jump to next line
+;             jmp $+2
+;             jmp $+2
+;             and al, 0b1000_1000
+;             cmp al, 0b0000_1000
+;             jnz .check
+;         ret
 
-    .reads:
-        mov dx, 0x1f0
-        mov cx, 256
-        .readw:
-            in ax,dx
-            jmp $+2
-            jmp $+2
-            jmp $+2
-            mov [edi], ax
-            add edi, 2
-            loop .readw
-        ret
+;     .reads:
+;         mov dx, 0x1f0
+;         mov cx, 256
+;         .readw:
+;             in ax,dx
+;             jmp $+2
+;             jmp $+2
+;             jmp $+2
+;             mov [edi], ax
+;             add edi, 2
+;             loop .readw
+;         ret
 
 code_selector equ (1 << 3)
 data_selector equ (2 << 3)
@@ -187,7 +206,7 @@ gdt_code:
     dw memory_limit & 0xffff ; segment limit 0~15
     dw memory_base & 0xffff ; base address 0~15
     db (memory_base >> 16) & 0xff; base address 16~23
-    db 0b_1_00_1_1_0_1_0 ; exist_dpl(discriptor privilege level) is 0_S is Code_ NOT compliance_writable_haven't been accessed
+    db 0b_1_00_1_1_0_1_0 ; exist_dpl(discriptor privilege level) is 0_S is Code_ NOT compliance_readable_haven't been accessed
     db 0b1_1_0_0_0000 | (memory_limit >> 16) & 0xf ; 4K_32bit_not 64bit_available to OS_segment limit 16~19
     db (memory_base >> 24) & 0xff ; base address 24~31
 
