@@ -197,35 +197,6 @@ jmp .
 //             loop .readw
 //         ret
 
-// .equ code_selector, (1 << 3)
-// .equ data_selector, (2 << 3)
-
-// .equ memory_base, 0 # base address: where the memory start
-// .equ memory_limit, 1048575 # ((1024* 1024* 1024 * 4) / (1024 * 4)) -1
-
-// gdt_ptr:
-//     .word (gdt_end - gdt_base) - 1
-//     .long gdt_base
-// gdt_base:
-//     .long 0, 0 # NULL Discriptor
-// gdt_code:
-//     .word memory_limit & 0xffff # segment limit 0~15
-//     .word memory_base & 0xffff # base address 0~15
-//     .byte (memory_base >> 16) & 0xff # base address 16~23
-//     .byte 0b10011010 # exist_dpl(discriptor privilege level) is 0_S is Code_ NOT compliance_readable_haven't been accessed
-//     .byte 0b11000000 | (memory_limit >> 16) & 0xf # 4K_32bit_not 64bit_available to OS_segment limit 16~19
-//     .byte (memory_base >> 24) & 0xff # base address 24~31
-
-// gdt_data:
-//     .word memory_limit & 0xffff # segment limit 0~15
-//     .word memory_base & 0xffff # base address 0~15
-//     .byte (memory_base >> 16) & 0xff # base address 16~23
-//     .byte 0b10010010 # exist_dpl(discriptor privilege level) is 0_S is Data_upward extend_writable_haven't been accesseds
-//     .byte 0b11000000 | (memory_limit >> 16) & 0xf # 4K_32bit_not 64bit_available to OS_segment limit 16~19
-//     .byte (memory_base >> 24) & 0xff # base address 24~31
-
-// gdt_end:
-
 code_selector = gdt_code - gdt_base
 data_selector = gdt_data - gdt_base
 

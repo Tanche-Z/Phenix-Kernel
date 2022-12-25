@@ -75,12 +75,14 @@ CFLAGS:= -fno-builtin # no built-in function in gcc
 CFLAGS+= -fno-pic # no position independent code
 CFLAGS+= -fno-pie # no position independent excutable
 CFLAGS+= -ffreestanding
+CFLAGS+= -fno-tree-vectorize # no vectorize instructor
 CFLAGS+= -fno-stack-protector # no stack protector
 CFLAGS+= -nostdinc # no standard c header
 CFLAGS+= -nostdinc++ # no standard c++ header
 CFLAGS+= -nostdlib # no standard library
-CFLAGS+= -m32 # (when using gcc target x86_64) i386 mode
+CFLAGS+= -m32 # (when using gcc target x86_64) enable i386 mode
 # CFLAGS+= -Wa,--32 # (when using i686 gcc) pass option to assembler (generate 32bits code)
+# CFLAGS+= -Wl,-melf_i386 # (when using i686 gcc) pass option to linker (generate 32bits code)
 CFLAGS:=$(strip ${CFLAGS})
 
 BOOT_EP:=0x7c00
