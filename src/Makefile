@@ -193,7 +193,7 @@ bochs: $(BUILD)/master.img
 # Bochs gdb with stub
 .PHONY: bochs-gdb
 bochs-gdb: $(BUILD)/master.img
-	bochs-gdb -q -f $(BOCHS_CONFIG)/bochsrc_gdb
+	bochs-gdb -q -f $(BOCHS_CONFIG)/bochsrc-gdb
 
 # generate vmware disk image
 $(BUILD)/master.vmdk: $(BUILD)/master.img
