@@ -105,19 +105,19 @@ BOOT:=arch/$(TARGET_ARCH)/$(TARGET)/boot/
 # change assembler from NASM to GNU AS(x86)
 $(BUILD)/$(BOOT)boot.bin: $(SRC)/$(BOOT)boot.S
 	$(shell mkdir -p $(dir $@))
-	$(AS) --32 --gdwarf-5 $< -o $@.o
+	$(AS) --32 $(DEBUG) $< -o $@.o
 	$(LD) -m elf_i386 -static $@.o -o $@.elf -Ttext $(BOOT_EP)
 	$(OBJCOPY) -O binary $@.elf $@
 
 $(BUILD)/$(BOOT)loader.bin: $(SRC)/$(BOOT)loader.S
 	$(shell mkdir -p $(dir $@))
-	$(AS) --32 --gdwarf-5 $< -o $@.o
+	$(AS) --32 $(DEBUG) $< -o $@.o
 	$(LD) -m elf_i386 -static $@.o -o $@.elf -Ttext $(LOADER_EP)
 	$(OBJCOPY) -O binary $@.elf $@
 
 $(BUILD)/%.o: $(SRC)/%.S
 	$(shell mkdir -p $(dir $@))
-	$(AS) --32 --gdwarf-5 $< -o $@
+	$(AS) --32 $(DEBUG) $< -o $@
 
 $(BUILD)/%.o: $(SRC)/%.c
 	$(shell mkdir -p $(dir $@))
@@ -125,8 +125,8 @@ $(BUILD)/%.o: $(SRC)/%.c
 
 $(BUILD)/kernel.bin: \
 	$(BUILD)/kernel/start.o \
+	$(BUILD)/kernel/main.o
 
-# $(BUILD)/kernel/main.o
 # 	# $(BUILD)/kernel/io.o \
 # 	# $(BUILD)/kernel/console.o \
 # 	# $(BUILD)/kernel/printk.o \
@@ -154,7 +154,9 @@ $(BUILD)/master.img: $(BUILD)/$(BOOT)boot.bin \
 # 	yes | bximage -q -hd=16 -func=create -sectsize=512 -imgmode=flat $@; \
 # fi
 
-	yes | bximage -q -hd=16 -func=create -sectsize=512 -imgmode=flat $@; \
+# yes | bximage -q -func=create -hd=16  -sectsize=512 -imgmode=flat $@
+
+	qemu-img create -o size=16M $@ 
 	dd if=$(BUILD)/$(BOOT)boot.bin of=$@ bs=512 count=1 conv=notrunc
 	dd if=$(BUILD)/$(BOOT)loader.bin of=$@ bs=512 count=4 seek=2 conv=notrunc
 	dd if=$(BUILD)/system.bin of=$@ bs=512 count=200 seek=10 conv=notrunc

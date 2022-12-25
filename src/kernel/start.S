@@ -4,7 +4,9 @@
 
 .global _start
 _start:
-    // call _kernel_init
-    movb $0x4b, 0xb8000 # print K at first char in display
+    xchg %bx, %bx
+    call _kernel_init
+    xchg %bx, %bx
+    // movb $0x4b, 0xb8000 # print K at first char in display
     jmp .
 
