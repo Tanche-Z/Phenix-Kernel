@@ -4,6 +4,8 @@
 
 ph1nix OS.
 
+Learning from [Onix](<https://github.com/StevenBaby/onix>).
+
 ### <mark>To Do:<mark>
 
 - [ ] Basic Function of System Kernel:
