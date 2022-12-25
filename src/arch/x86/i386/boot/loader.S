@@ -59,15 +59,13 @@ detect_memory:
     jmp pre_protected_mode
 
 pre_protected_mode:
-    xchg %bx, %bx
-
     cli # clear interrupt
     # open the A20
     in $0x92, %al
     or $0b10, %al
     out %al, $0x92
     lgdtl gdt_ptr # load GDT
-    # PE(Protect Enable)
+    # PE(Protect Enable) (set cr0 to 1)
     mov %cr0, %eax
     or $1, %eax
     mov %eax, %cr0
@@ -111,91 +109,90 @@ protect_mode:
     mov %ax, %gs
     mov %ax, %ss # initialize segment register
 
-// code bening trunc!!! No high bits
     mov $0x10000, %esp # set stack top
 
-    movb $0x50, 0xb8000
-    movb $0x50, 0x200000
+    // # Reset first char in display with 'P', indicating entered Proteted Mode
+    // movb $0x50, 0xb8000
+    // movb $0x50, 0x200000
 
-    // mov $0x10000, %edi # read target memory
-//     mov $10, %ecx # start sector
-//     mov $200, %bl # sector count
-//     call read_disk
+    mov $0x10000, %edi # read target memory (kernel)
+    mov $10, %ecx # start sector
+    mov $200, %bl # sector count
+    call read_disk
 
-//     ljmp $code_selector, $0x10000
-//     ud2 # means error occur
-
+    ljmp $code_selector, $0x10000 # go to kernel
+    ud2 # means error occur (should never excute to here) (if here, error occur)
 jmp .
 
-// read_disk:
+read_disk:
 
-//     mov $0x1f2, %dx
-//     mov %bl, %al
-//     out %al, (%dx)
+    mov $0x1f2, %dx
+    mov %bl, %al
+    out %al, (%dx)
 
-//     inc %dx # 0x1f3
-//     mov %cl, %al
-//     out %al, (%dx)
+    inc %dx # 0x1f3
+    mov %cl, %al
+    out %al, (%dx)
 
-//     inc %dx # 0x1f4
-//     shr $8, %ecx
-//     mov %cl, %al
-//     out %al, (%dx)
+    inc %dx # 0x1f4
+    shr $8, %ecx
+    mov %cl, %al
+    out %al, (%dx)
 
-//     inc %dx # 0x1f5
-//     shr $8, %ecx
-//     mov %cl, %al # the high 8 bits of start sector
-//     out %al, (%dx)
+    inc %dx # 0x1f5
+    shr $8, %ecx
+    mov %cl, %al # the high 8 bits of start sector
+    out %al, (%dx)
 
-//     inc %dx # 0x1f6
-//     shr $8, %ecx
-//     and $0b1111, %cl # set the high 4 bits as 0
+    inc %dx # 0x1f6
+    shr $8, %ecx
+    and $0b1111, %cl # set the high 4 bits as 0
 
-//     mov $0b11100000, %al
-//     or %cl, %al
-//     out %al, (%dx) # LBA mode
+    mov $0b11100000, %al
+    or %cl, %al
+    out %al, (%dx) # LBA mode
 
-//     inc %dx # 0x1f7
-//     mov $0x20, %al
-//     out %al, (%dx)
+    inc %dx # 0x1f7
+    mov $0x20, %al
+    out %al, (%dx)
 
-//     xor %ecx, %ecx # clear ECX
+    xor %ecx, %ecx # clear ECX
 
-//     mov %bl, %cl # get the count of read/write sectors
+    mov %bl, %cl # get the count of read/write sectors
 
-//     .read:
-//         push %cx
-//         call .waits
-//         call .reads
-//         pop %cx
-//         loop .read
+    .read:
+        push %cx
+        call .waits
+        call .reads
+        pop %cx
+        loop .read
 
-//     ret
+    ret
 
-//     .waits:
-//         mov $0x1f7, %dx
-//         .check:
-//         in (%dx), %al
-//         jmp .+2 # jump to next line
-//         jmp .+2
-//         jmp .+2
-//         and $0b10001000, %al
-//         cmp $0b00001000, %al
-//         jnz .check
-//     ret
+    .waits:
+        mov $0x1f7, %dx
+        .check:
+        in (%dx), %al
+        jmp .+2 # jump to next line
+        jmp .+2
+        jmp .+2
+        and $0b10001000, %al
+        cmp $0b00001000, %al
+        jnz .check
+    ret
 
-//     .reads:
-//         mov $0x1f0, %dx
-//         mov $256, %cx
-//         .readw:
-//             in (%dx), %ax
-//             jmp .+2
-//             jmp .+2
-//             jmp .+2
-//             mov %ax, (%edi)
-//             add $2, %edi
-//             loop .readw
-//         ret
+    .reads:
+        mov $0x1f0, %dx
+        mov $256, %cx
+        .readw:
+            in (%dx), %ax
+            jmp .+2
+            jmp .+2
+            jmp .+2
+            mov %ax, (%edi)
+            add $2, %edi
+            loop .readw
+        ret
 
 code_selector = gdt_code - gdt_base
 data_selector = gdt_data - gdt_base

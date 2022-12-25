@@ -19,8 +19,6 @@ _start:
     mov $4, %bl # sector count
     call read_disk
 
-    // xchg %bx, %bx # magic break point for bochs
-
     # magic (0x55aa) for detecting if the loader have been read to right location
     cmpw $0x55aa, 0x1000
     jnz error

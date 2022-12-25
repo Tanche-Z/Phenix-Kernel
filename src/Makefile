@@ -81,8 +81,8 @@ CFLAGS+= -nostdinc # no standard c header
 CFLAGS+= -nostdinc++ # no standard c++ header
 CFLAGS+= -nostdlib # no standard library
 CFLAGS+= -m32 # (when using gcc target x86_64) enable i386 mode
-# CFLAGS+= -Wa,--32 # (when using i686 gcc) pass option to assembler (generate 32bits code)
-# CFLAGS+= -Wl,-melf_i386 # (when using i686 gcc) pass option to linker (generate 32bits code)
+# CFLAGS+= -Wa,--32,--gdwarf-5,-o,$@.o # (when using i686 gcc) pass option to assembler (generate 32bits code)
+# CFLAGS+= -Wl,-melf_i386,-static,-o,$@.elf,-Ttext,$(BOOT_EP) # (when using i686 gcc) pass option to linker (generate 32bits code)
 CFLAGS:=$(strip ${CFLAGS})
 
 BOOT_EP:=0x7c00
@@ -115,38 +115,37 @@ $(BUILD)/$(BOOT)loader.bin: $(SRC)/$(BOOT)loader.S
 	$(LD) -m elf_i386 -static $@.o -o $@.elf -Ttext $(LOADER_EP)
 	$(OBJCOPY) -O binary $@.elf $@
 
-# $(BUILD)/%.o: $(SRC)/%.S
-# 	$(shell mkdir -p $(dir $@))
-# 	$(AS) --gdwarf-5 $< -o $@
+$(BUILD)/%.o: $(SRC)/%.S
+	$(shell mkdir -p $(dir $@))
+	$(AS) --32 --gdwarf-5 $< -o $@
 
-# $(BUILD)/%.o: $(SRC)/%.c
-# 	$(shell mkdir -p $(dir $@))
-# 	$(CC) $(CFLAGS) $(DEBUG) $(INCLUDE) -c $< -o $@
+$(BUILD)/%.o: $(SRC)/%.c
+	$(shell mkdir -p $(dir $@))
+	$(CC) $(CFLAGS) $(DEBUG) $(INCLUDE) -c $< -o $@
 
-# $(BUILD)/kernel.bin: \
-# 	$(BUILD)/kernel/start.o \
-# 	$(BUILD)/kernel/main.o
+$(BUILD)/kernel.bin: \
+	$(BUILD)/kernel/start.o \
 
+# $(BUILD)/kernel/main.o
 # 	# $(BUILD)/kernel/io.o \
 # 	# $(BUILD)/kernel/console.o \
 # 	# $(BUILD)/kernel/printk.o \
 # 	# $(BUILD)/lib/string.o \
 # 	# $(BUILD)/lib/vsprintf.o
 
-# $(shell mkdir -p $(dir $@))
-# $(LD) -m elf_i386 -static $^ -o $@ -Ttext $(KERNEL_EP)
+	$(shell mkdir -p $(dir $@))
+	$(LD) -m elf_i386 -static $^ -o $@ -Ttext $(KERNEL_EP)
 
-# $(BUILD)/system.bin: $(BUILD)/kernel.bin
-# 	$(OBJCOPY) -O binary $< $@
+$(BUILD)/system.bin: $(BUILD)/kernel.bin
+	$(OBJCOPY) -O binary $< $@
 
-# $(BUILD)/system.map: $(BUILD)/kernel.bin
-# 	nm $< | sort > $@
+$(BUILD)/system.map: $(BUILD)/kernel.bin
+	nm $< | sort > $@
 
 $(BUILD)/master.img: $(BUILD)/$(BOOT)boot.bin \
-	$(BUILD)/$(BOOT)loader.bin
-
-# $(BUILD)/system.bin \
-# $(BUILD)/system.map
+	$(BUILD)/$(BOOT)loader.bin \
+	$(BUILD)/system.bin \
+	$(BUILD)/system.map
 
 # # choosing different version of bximage in Debian like distro (if using newer version like in Arch, no need)
 # if [ $(HOST_KERNEL) == "Linux" ];then \
@@ -156,10 +155,9 @@ $(BUILD)/master.img: $(BUILD)/$(BOOT)boot.bin \
 # fi
 
 	yes | bximage -q -hd=16 -func=create -sectsize=512 -imgmode=flat $@; \
-	
 	dd if=$(BUILD)/$(BOOT)boot.bin of=$@ bs=512 count=1 conv=notrunc
 	dd if=$(BUILD)/$(BOOT)loader.bin of=$@ bs=512 count=4 seek=2 conv=notrunc
-# dd if=$(BUILD)/system.bin of=$@ bs=512 count=200 seek=10 conv=notrunc
+	dd if=$(BUILD)/system.bin of=$@ bs=512 count=200 seek=10 conv=notrunc
 
 .PHONY: clean
 clean:
@@ -232,5 +230,5 @@ vdi: $(BUILD)/master.vdi
 
 # 	dd if=$(BUILD)/master.img of=/dev/sda
 
-# .PHONY: test
-# test: $(BUILD)/boot/boot.o
+.PHONY: test
+test: $(BUILD)/master.img
