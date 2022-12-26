@@ -35,14 +35,14 @@ static int skip_atoi(const char **s)
 static char *number(char *str, unsigned long num, int base, int size, int precision, int flags)
 {
     char c, sign , tmp[36];
-    const char *digits = "01234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const char *digits = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     int i;
     int index;
     char *ptr = str;
 
     // if flags indicate to use lowercase, define the lowercases
     if (flags & SMALL)
-        digits = "01234567890abcdefghijklmnopqrstuvwxyz";
+        digits = "0123456789abcdefghijklmnopqrstuvwxyz";
 
     // if flags indicate to left justifying, shield the flags of ZEROPAD
     if (flags & LEFT)
@@ -81,9 +81,9 @@ static char *number(char *str, unsigned long num, int base, int size, int precis
     i = 0;
     // if the value of num is 0, put temporary string ='0'. Otherwize use given base tranform num into string format.
     if (num ==0)
-        tmp[i++] == '0';
+        tmp[i++] = '0';
     else
-        while  (num != '0')
+        while  (num != 0)
         {
             index = num % base;
             num /= base;
@@ -338,10 +338,4 @@ int sprintf(char *buf, const char *fmt, ...)
     int i = vsprintf(buf, fmt, args);
     va_end(args);
     return i;
-}
-
-void test_vsprintf()
-{
-    char str[128];
-    number(str, 12345, 10, 2, 2, 0);
 }
