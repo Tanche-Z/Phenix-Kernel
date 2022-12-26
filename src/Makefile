@@ -23,7 +23,7 @@ HOST_ARCH:=$(shell uname -m)
 HOST_KERNEL:=$(shell uname -s)
 HOST_DISTRO:=$(shell uname -n)
 
-BREW_LLVM_PATH:=/opt/homebrew/opt/bin/llvm/
+BREW_LLVM_PATH:=/opt/homebrew/opt/llvm/bin/
 # Host: Apple Silicon Mac(arm64), Target: i686 (32bits)
 ifeq ($(HOST_KERNEL), Darwin)
 	ifeq ($(HOST_ARCH), arm64)
