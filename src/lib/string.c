@@ -1,5 +1,6 @@
 #include <ph1nix/string.h>
 
+// string copy
 char *strcpy(char *dest, const char *src)
 {
     char *ptr = dest;
@@ -11,6 +12,7 @@ char *strcpy(char *dest, const char *src)
     }
 }
 
+// string cat
 char *strcat(char *dest, const char *src)
 {
     char *ptr = dest;
@@ -28,6 +30,7 @@ char *strcat(char *dest, const char *src)
     }
 }
 
+// string length
 size_t strlen(const char *str)
 {
     char *ptr = (char *)str;
@@ -38,6 +41,7 @@ size_t strlen(const char *str)
     return ptr - str;
 }
 
+// string compare
 int strcmp(const char *lhs, const char *rhs)
 {
     while (*lhs == *rhs && *lhs != _EOS && *rhs !=_EOS)
@@ -45,9 +49,10 @@ int strcmp(const char *lhs, const char *rhs)
         lhs++;
         rhs++;
     }
-    return *lhs < *rhs ? -1 : *lhs > *rhs;
+    return *lhs < *rhs ? -1 : *lhs > *rhs; // if not less, return -1; if same, return 0, if greater, return 1
 }
 
+// find char (first (most left))
 char *strchr(const char *str, int ch)
 {
     char *ptr = (char *)str;
@@ -64,7 +69,8 @@ char *strchr(const char *str, int ch)
     }
 }
 
-char *strrchr (const char *str, int ch) // return the last (most right) char in a string
+// find char (last(most right)))
+char *strrchr (const char *str, int ch) // return pointer to the last (most right) char in a string
 {
     char *last = _NULL;
     char *ptr = (char *)str;
@@ -80,7 +86,7 @@ char *strrchr (const char *str, int ch) // return the last (most right) char in 
         }
     }
 }
-
+// memory content compare
 int memcmp (const void *lhs, const void *rhs, size_t count)
 {
     char *lptr = (char *) lhs;
@@ -93,6 +99,7 @@ int memcmp (const void *lhs, const void *rhs, size_t count)
     return *lptr < *rptr ? -1 : *lptr > *rptr;
 }
 
+// set memory content to 'dest' with content of 'ch' for 'count'
 void *memset(void *dest, int ch, size_t count)
 {
     char *ptr = dest;
@@ -103,6 +110,7 @@ void *memset(void *dest, int ch, size_t count)
     return dest;
 }
 
+// memory content copy
 void *memcpy(void *dest, const void *src, size_t count)
 {
     char *ptr = dest;
@@ -113,6 +121,7 @@ void *memcpy(void *dest, const void *src, size_t count)
     return dest;
 }
 
+// find first char in memory
 void *memchr(const void *str, int ch, size_t count) // find char in a block of memory
 {
     char *ptr = (char *) str;

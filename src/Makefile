@@ -9,10 +9,14 @@ BOCHS_CONFIG:=$(TOOLS)/bochs-config
 HOME_BREW_ARM64_PATH:=/opt/homebrew/bin/
 LINUX_PATH:=/usr/bin/
 LINUX_LOCAL_PATH:=/usr/local/bin/
-#TARGET_ARCH:=x86
-TARGET_ARCH:=i386
-#TARGET_ARCH:=x86_64
-#TARGET_ARCH:=aarch64
+
+TARGET_ARCH:=x86
+#TARGET_ARCH:=arm
+#TARGET_ARCH:=risc-v
+
+TARGET_ARCH_SUB:=i386
+#TARGET_ARCH_SUB:=x86_64
+#TARGET_ARCH_SUB:=aarch64
 
 # building host config
 HOST_ARCH:=$(shell uname -m)
@@ -22,7 +26,7 @@ HOST_DISTRO:=$(shell uname -n)
 # Host: Apple Silicon Mac(arm64), Target: i686 (32bits)
 ifeq ($(HOST_KERNEL), Darwin)
 	ifeq ($(HOST_ARCH), arm64)
-		ifeq ($(TARGET_ARCH), i386)
+		ifeq ($(TARGET_ARCH_SUB), i386)
 		TOOL_PATH:=$(HOME_BREW_ARM64_PATH)$(TARGET)-elf-
 		GDB:=$(HOME_BREW_ARM64_PATH)i386-elf-gdb
 		endif
@@ -32,7 +36,7 @@ endif
 ifeq ($(HOST_KERNEL), Linux) 
 	GDB:=$(LINUX_PATH)gdb
 	ifeq ($(HOST_ARCH), x86_64)
-		ifeq ($(TARGET_ARCH), i386)
+		ifeq ($(TARGET_ARCH_SUB), i386)
 			# Host: Linux (x86_64), Target: i386 (32bits)
 			# TOOL_PATH:=$(LINUX_LOCAL_PATH)i686-elf-
 			# GDB:=$(LINUX_LOCAL_PATH)i686-elf-gdb
@@ -40,7 +44,7 @@ ifeq ($(HOST_KERNEL), Linux)
 		endif
 	endif
 	ifeq ($(HOST_ARCH), aarch64)	
-		ifeq ($(TARGET_ARCH), i386)
+		ifeq ($(TARGET_ARCH_SUB), i386)
 			ifeq ($(HOST_DISTRO), Asahi)
 				# Host: Linux (arm64), Target: i386 (32bits)
 				TOOL_PATH:=$(LINUX_LOCAL_PATH)i686-elf-
@@ -93,7 +97,7 @@ KERNEL_EP:=0x10000
 DEBUG:= -g
 INCLUDE:= -I $(SRC)/include/
 
-BOOT:=arch/$(TARGET_ARCH)/$(TARGET)/boot/
+BOOT:=arch/$(TARGET_ARCH)/$(TARGET_ARCH_SUB)/boot/
 
 $(BUILD)/$(BOOT)boot.bin: $(SRC)/$(BOOT)boot.S
 	$(shell mkdir -p $(dir $@))
@@ -118,11 +122,11 @@ $(BUILD)/%.o: $(SRC)/%.c
 $(BUILD)/kernel.bin: \
 	$(BUILD)/kernel/start.o \
 	$(BUILD)/kernel/main.o \
-	$(BUILD)/kernel/io.o
-	
+	$(BUILD)/kernel/io.o \
+	$(BUILD)/lib/string.o
 # 	# $(BUILD)/kernel/console.o \
 # 	# $(BUILD)/kernel/printk.o \
-# 	# $(BUILD)/lib/string.o \
+
 # 	# $(BUILD)/lib/vsprintf.o
 
 	$(shell mkdir -p $(dir $@))
