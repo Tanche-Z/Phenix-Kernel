@@ -2,10 +2,12 @@
 #include <ph1nix/console.h>
 #include <ph1nix/stdio.h>
 
+// buffer for storing ouput string
 static char buf[1024];
 
 int printk (const char *fmt, ...)
 {
+    // var args
     va_list args;
     int i;
 

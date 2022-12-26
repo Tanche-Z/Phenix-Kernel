@@ -1,6 +1,8 @@
 {
     "files.associations": {
+        "*.txt": "plaintext",
         "types.h": "c",
-        "stdio.h": "c"
+        "stdio.h": "c",
+        "console.h": "c"
     }
 }

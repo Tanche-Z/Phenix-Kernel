@@ -13,9 +13,10 @@
 #define MEM_BASE 0xB8000              // video card memory start
 #define MEM_SIZE 0x4000               // video card memory size
 #define MEM_END (MEM_BASE + MEM_SIZE) // video card memory end
+// CGA (Color Graphic Adapter) (text mode) (80*25 char)
 #define WIDTH 80                      // row of text in one screen
 #define HEIGHT 25                     // colume of text in one screen
-#define ROW_SIZE (WIDTH * 2)          // number of Bytes in one row
+#define ROW_SIZE (WIDTH * 2)          // number of Bytes in one row (2 bytes per char)
 #define SCR_SIZE (ROW_SIZE * HEIGHT)  // number of Bytes in one screen
 
 #define ASCII_NUL 0x00
@@ -31,10 +32,10 @@
 
 static u32 screen_base; // start of current display
 static u32 cursor_base; // start of current cursor position
-static x, y;            // coordinate of current sursor
+static u32 x, y;            // coordinate of current sursor
 
 static u8 attr = 7;        // style of character
-static u16 erase = 0x0720; // space with style
+static u16 erase = 0x0720; // space with style (07 is space, 20 is style)
 
 
 // get current start of display
@@ -90,6 +91,7 @@ static void command_del()
     *(u16 *)cursor_base = erase;
 }
 
+// move cursor to start of the line
 static void command_cr()
 {
     cursor_base -= (x << 1);
@@ -98,38 +100,33 @@ static void command_cr()
 
 static void scroll_up()
 {
-    if (screen_base + SCR_SIZE + ROW_SIZE <= MEM_END)
+    if (screen_base + SCR_SIZE + ROW_SIZE >= MEM_END)
     {
-        u32 *ptr = (u32 *)(screen_base + SCR_SIZE);
-        for (size_t i = 0; i < WIDTH; i++)
-        {
-            *ptr++ = erase;
-        }
-
-        screen_base += ROW_SIZE;
-        y++;
-        cursor_base += ROW_SIZE;
-    }
-    else
-    {
-        memcpy(MEM_BASE, screen_base, MEM_SIZE);
+        memcpy((void *)MEM_BASE, (void *)screen_base, SCR_SIZE);
         cursor_base -= (screen_base - MEM_BASE);
         screen_base = MEM_BASE;
     }
 
+    u32 *ptr = (u32 *)(screen_base + SCR_SIZE);
+    for (size_t i = 0; i < WIDTH; i++)
+    {
+        *ptr++ = erase;
+    }
+    screen_base += ROW_SIZE;
+    cursor_base += ROW_SIZE;
     set_screen();
 }
 
 static void command_lf()
 {
-    if (y + 1 < HEIGHT)
+    if (y + 1 < HEIGHT) // if height not outflow
     {
         y++;
         cursor_base += ROW_SIZE;
-        return;
+        return; // return, then not scroll up
     }
 
-    scroll_up();
+    scroll_up(); // if outflow, then scroll up
 }
 
 static void command_bs()
@@ -152,49 +149,49 @@ void console_write(char *buf, u32 count)
         ch = *buf++;
         switch (ch)
         {
-        case ASCII_NUL:
-            break;
-        case ASCII_BEL:
-            // todo \a
-            break;
-        case ASCII_BS:
-            command_bs();
-            break;
-        case ASCII_HT:
-            break;
-        case ASCII_LF:
-            command_lf();
-            command_cr();
-            break;
-        case ASCII_VT:
-            break;
-        case ASCII_FF:
-            command_lf();
-            break;
-        case ASCII_CR:
-            command_cr();
-            break;
-        case ASCII_DEL:
-            command_del();
-            break;
-        default:
-            if (x >= WIDTH)
-            {
-                x -= WIDTH;
-                cursor_base -= ROW_SIZE;
+            case ASCII_NUL:
+                break;
+            case ASCII_BEL:
+                // todo \a
+                break;
+            case ASCII_BS:
+                command_bs();
+                break;
+            case ASCII_HT:
+                break;
+            case ASCII_LF:
                 command_lf();
-            }
+                command_cr();
+                break;
+            case ASCII_VT:
+                break;
+            case ASCII_FF:
+                command_lf();
+                break;
+            case ASCII_CR:
+                command_cr();
+                break;
+            case ASCII_DEL:
+                command_del();
+                break;
+            default:
+                if (x >= WIDTH) // outflow of width
+                {
+                    x -= WIDTH; // new x for next line
+                    cursor_base -= ROW_SIZE;
+                    command_lf(); // next line
+                }
 
-            *((char *)cursor_base) = ch;
-            cursor_base++;
-            *((char *)cursor_base) = attr;
-            cursor_base++;
+                *((char *)cursor_base) = ch;
+                cursor_base++;
+                *((char *)cursor_base) = attr;
+                cursor_base++;
 
-            x++;
-            break;
+                x++;
+                break;
         }
-        set_cursor();
     }
+    set_cursor();
 }
 
 
@@ -207,7 +204,7 @@ void console_clear()
     set_screen();
 
     u16 *ptr = (u16 *)MEM_BASE;
-    while (ptr < MEM_END)
+    while (ptr < (u16 *)MEM_END)
     {
         *ptr++ = erase;
     }
