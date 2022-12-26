@@ -23,14 +23,20 @@ HOST_ARCH:=$(shell uname -m)
 HOST_KERNEL:=$(shell uname -s)
 HOST_DISTRO:=$(shell uname -n)
 
+BREW_LLVM_PATH:=/opt/homebrew/opt/bin/llvm/
 # Host: Apple Silicon Mac(arm64), Target: i686 (32bits)
 ifeq ($(HOST_KERNEL), Darwin)
 	ifeq ($(HOST_ARCH), arm64)
 		ifeq ($(TARGET_ARCH_SUB), i386)
-		TOOL_PATH:=$(HOME_BREW_ARM64_PATH)$(TARGET)-elf-
-		GDB:=$(HOME_BREW_ARM64_PATH)i386-elf-gdb
+		TOOL_PATH:=$(HOME_BREW_ARM64_PATH)i686-elf-
+		GDB:=$(HOME_BREW_ARM64_PATH)$(TARGET_ARCH_SUB)-elf-gdb
 		endif
 	endif
+	AS:=$(TOOL_PATH)as
+	LD:=$(BREW_LLVM_PATH)ld.lld
+	CC:=$(BREW_LLVM_PATH)clang --taget=$(TARGET_ARCH_SUB)
+	OBJCOPY:=$(BREW_LLVM_PATH)llvm-objcopy
+	OBJDUMP:=$(BREW_LLVM_PATH)llvm-objdump
 endif
 
 ifeq ($(HOST_KERNEL), Linux) 
@@ -56,13 +62,12 @@ ifeq ($(HOST_KERNEL), Linux)
 			
 		endif
 	endif
+	AS:=$(TOOL_PATH)as
+	LD:=$(TOOL_PATH)ld
+	CC:=$(TOOL_PATH)gcc
+	OBJCOPY:=$(TOOL_PATH)objcopy
+	OBJDUMP:=$(TOOL_PATH)objdump
 endif
-
-AS:=$(TOOL_PATH)as
-CC:=$(TOOL_PATH)gcc
-LD:=$(TOOL_PATH)ld
-OBJCOPY:=$(TOOL_PATH)objcopy
-OBJDUMP:=$(TOOL_PATH)objdump
 
 .PHONY: show_config
 show_config:
@@ -83,11 +88,10 @@ CFLAGS+= -ffreestanding
 CFLAGS+= -fno-tree-vectorize # no vectorize instructor
 CFLAGS+= -fno-stack-protector # no stack protector
 CFLAGS+= -nostdinc # no standard c header
-CFLAGS+= -nostdinc++ # no standard c++ header
+# CFLAGS+= -nostdinc++ # no standard c++ header
 CFLAGS+= -nostdlib # no standard library
+CFLAGS+= -march=i386
 CFLAGS+= -m32 # (when using gcc target x86_64) enable i386 mode
-# CFLAGS+= -Wa,--32,--gdwarf-5,-o,$@.o # (when using i686 gcc) pass option to assembler (generate 32bits code)
-# CFLAGS+= -Wl,-melf_i386,-static,-o,$@.elf,-Ttext,$(BOOT_EP) # (when using i686 gcc) pass option to linker (generate 32bits code)
 CFLAGS:=$(strip ${CFLAGS})
 
 BOOT_EP:=0x7c00

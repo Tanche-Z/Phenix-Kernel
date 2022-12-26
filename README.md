@@ -68,8 +68,8 @@ Learning from [Onix](<https://github.com/StevenBaby/onix>).
 # Current Dev Env
 ## MacOS (Apple Silicon)
 - Homebrew packages:
-  - i686-elf-gcc
-  - i686-elf-binutils
+  - llvm (for clang, ld.lld, llvm-objcopy, llvm-objdump)
+  - x86_64-elf-binutils (for GNU AS)
   - qemu
   - bochs
 ## Linux (aarch64) 
@@ -88,11 +88,12 @@ Learning from [Onix](<https://github.com/StevenBaby/onix>).
 ## Linux (x86_64) 
 - (Arch) 
   - pacman packages:
+    - base-devel
     - qemu-system-x86
     - bochs
   - aur packages:
     - bochs-gdb-stub
-  - [compile](<tools/build-tool-chains/build-tool-chains-arch-linux-x86_64.md>):
-    - i686-elf-gcc
-    - i686-elf-binutils
-    - i686-elf-gdb
+  - ~~[compile](<tools/build-tool-chains/build-tool-chains-arch-linux-x86_64.md>):~~
+    ~~- i686-elf-gcc~~
+    ~~- i686-elf-binutils~~
+    ~~- i686-elf-gdb~~
