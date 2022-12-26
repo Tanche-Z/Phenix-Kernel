@@ -34,7 +34,7 @@ ifeq ($(HOST_KERNEL), Darwin)
 	endif
 	AS:=$(TOOL_PATH)as
 	LD:=$(BREW_LLVM_PATH)ld.lld
-	CC:=$(BREW_LLVM_PATH)clang --taget=$(TARGET_ARCH_SUB)
+	CC:=$(BREW_LLVM_PATH)clang -taget=$(TARGET_ARCH_SUB)
 	OBJCOPY:=$(BREW_LLVM_PATH)llvm-objcopy
 	OBJDUMP:=$(BREW_LLVM_PATH)llvm-objdump
 endif
