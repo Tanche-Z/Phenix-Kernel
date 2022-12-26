@@ -28,7 +28,7 @@ BREW_LLVM_PATH:=/opt/homebrew/opt/bin/llvm/
 ifeq ($(HOST_KERNEL), Darwin)
 	ifeq ($(HOST_ARCH), arm64)
 		ifeq ($(TARGET_ARCH_SUB), i386)
-		TOOL_PATH:=$(HOME_BREW_ARM64_PATH)i686-elf-
+		TOOL_PATH:=$(HOME_BREW_ARM64_PATH)x86_64-elf-
 		GDB:=$(HOME_BREW_ARM64_PATH)$(TARGET_ARCH_SUB)-elf-gdb
 		endif
 	endif
