@@ -31,7 +31,7 @@ Learning from [Onix](<https://github.com/StevenBaby/onix>).
 
 - [x] NASM to GNU AS
 
-- [ ] i686 to x86_64
+- [ ] i386 kernel to x86_64
 
 - [ ] Port to ARMV8 (aarch64)
   
@@ -74,12 +74,12 @@ Learning from [Onix](<https://github.com/StevenBaby/onix>).
   - bochs
 ## Linux (aarch64) 
 - (Debian) apt packages:
-  - gcc-i686-linux-gnu
-  - binutils-i686-linux-gnu
+  - gcc-x86_64-linux-gnu
+  - binutils-x86_64-linux-gnu
   - i386-elf-gdb
-  - qemu-system-x86
+  - qemu-system-x86_64
   - bochs
-- (Arch/Asahi) aur packages:
+- (Arch/Asahi) aur packages: ([or build from source (target x86_64)](tools/build-tool-chains/build-tool-chains-arch-linux-x86_64.md))
   - i686-elf-gcc-aarch64 
   - i686-elf-binutils-aarch64 
   - (bin86-aarch64) (optional)
@@ -89,11 +89,8 @@ Learning from [Onix](<https://github.com/StevenBaby/onix>).
 - (Arch) 
   - pacman packages:
     - base-devel
-    - qemu-system-x86
+    - qemu-full
     - bochs
+    - `llvm` `clang` `lld` (optional)
   - aur packages:
     - bochs-gdb-stub
-  - ~~[compile](<tools/build-tool-chains/build-tool-chains-arch-linux-x86_64.md>):~~
-    ~~- i686-elf-gcc~~
-    ~~- i686-elf-binutils~~
-    ~~- i686-elf-gdb~~

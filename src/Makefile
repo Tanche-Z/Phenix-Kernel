@@ -42,40 +42,39 @@ ifeq ($(HOST_KERNEL), Darwin)
 	OBJCOPY:=$(BREW_LLVM_PATH)llvm-objcopy
 	OBJDUMP:=$(BREW_LLVM_PATH)llvm-objdump
 endif
-ifeq ($(HOST_KERNEL), Linux) 
-	GDB:=$(LINUX_PATH)gdb
+ifeq ($(HOST_KERNEL), Linux)
 	ifeq ($(HOST_ARCH), x86_64)
 		ifeq ($(TARGET_ARCH_SUB), i386)
-			# Host: Linux (x86_64), Target: i386 (32bits)
-			# TOOL_PATH:=$(LINUX_LOCAL_PATH)i686-elf-
-			# GDB:=$(LINUX_LOCAL_PATH)i686-elf-gdb
 			TOOL_PATH:=$(LINUX_PATH)
 		endif
 	endif
-	# using GNU toolchain under x86_64 linux host
-	AS:=$(TOOL_PATH)as
-	LD:=$(TOOL_PATH)ld
-	CC:=$(TOOL_PATH)gcc
-	OBJCOPY:=$(TOOL_PATH)objcopy
-	OBJDUMP:=$(TOOL_PATH)objdump
-	# # using clang under x86_64 linux host
-	# AS:=$(TOOL_PATH)as
-	# LD:=$(TOOL_PATH)ld.lld
-	# CC:=$(TOOL_PATH)clang
-	# OBJCOPY:=$(TOOL_PATH)llvm-objcopy
-	# OBJDUMP:=$(TOOL_PATH)llvm-objdump
 	ifeq ($(HOST_ARCH), aarch64)	
 		ifeq ($(TARGET_ARCH_SUB), i386)
 			ifeq ($(HOST_DISTRO), Asahi)
-				# Host: Linux (arm64), Target: i386 (32bits)
-				TOOL_PATH:=$(LINUX_LOCAL_PATH)i686-elf-
+				# Host: Linux (arm64) (Arch like)
+				TOOL_PATH:=$(LINUX_LOCAL_PATH)x86_64-elf-
 			endif
 			ifneq ($(HOST_DISTRO), Asahi)
-				# Host: Linux (arm64), Target: i386 (32bits)
-				TOOL_PATH:=$(LINUX_PATH)i686-linux-gnu-
+				# Host: Linux (arm64) (Debian like)
+				TOOL_PATH:=$(LINUX_PATH)x86_64-linux-gnu-
 			endif
 		endif
 	endif
+	GDB:=$(LINUX_PATH)gdb
+
+	# # using GNU toolchain (default)
+	# AS:=$(TOOL_PATH)as
+	# LD:=$(TOOL_PATH)ld
+	# CC:=$(TOOL_PATH)gcc
+	# OBJCOPY:=$(TOOL_PATH)objcopy
+	# OBJDUMP:=$(TOOL_PATH)objdump
+
+	# using clang
+	AS:=$(TOOL_PATH)as
+	LD:=$(LINUX_PATH)ld.lld
+	CC:=$(LINUX_PATH)clang
+	OBJCOPY:=$(LINUX_PATH)llvm-objcopy
+	OBJDUMP:=$(LINUX_PATH)llvm-objdump
 endif
 
 .PHONY: show_config
@@ -104,15 +103,15 @@ CFLAGS+= -nostdinc # no standard c header
 # CFLAGS+= -nostdinc++ # no standard c++ header
 CFLAGS+= -nostdlib # no standard library
 
-# if using clang
-CFLAGS+= --target=$(TARGET_ARCH_SUB)-unknown-none-elf # using clang
-CFLAGS+= -mcpu=$(TARGET_ARCH_SUB) # using clang
-CFLAGS+= -fno-integrated-as # using clang
+# using gcc (default)
+CFLAGS+= -m32 # (when using gcc that target x86_64 (if target i686(already 32bits, then no need))) to enable i386 mode
+CFLAGS+= -march=$(TARGET_ARCH_SUB)
+CFLAGS+= -mtune=$(TARGET_ARCH_SUB) # optimize
 
-# # if using gcc
-# CFLAGS+= -m32 # (when using gcc that target x86_64 (if target i686(already 32bits, then no need))) to enable i386 mode
-# CFLAGS+= -march=$(TARGET_ARCH_SUB)
-# CFLAGS+= -mtune=$(TARGET_ARCH_SUB) # optimize
+# # if using clang
+# CFLAGS+= --target=$(TARGET_ARCH_SUB)-unknown-none-elf # using clang
+# CFLAGS+= -mcpu=$(TARGET_ARCH_SUB) # using clang
+# CFLAGS+= -fno-integrated-as # using clang
 
 # for GNU AS
 ASFLAGS+= --32 # 32bit mode
@@ -134,11 +133,9 @@ BOOT_EP:=0x7c00
 LOADER_EP:=0x1000
 KERNEL_EP:=0x10000
 
-
+# building from source
 $(BUILD)/$(BOOT)boot.bin: $(SRC)/$(BOOT)boot.S
 	$(shell mkdir -p $(dir $@))
-# $(AS) --32 $(DEBUG) $< -o $@.o
-# $(LD) -m elf_i386 -static $@.o -o $@.elf -Ttext $(BOOT_EP)
 	$(AS) $(ASFLAGS) $< -o $@.o
 	$(LD) $(LDFLAGS) $@.o -o $@.elf -Ttext $(BOOT_EP)
 	$(OBJCOPY) -O binary $@.elf $@
