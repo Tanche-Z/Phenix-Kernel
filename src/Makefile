@@ -1,15 +1,4 @@
-SRC:=.
-TEST=../tests
-BUILD:=../build
-TOOLS:=../tools
-TEST_BUILD:=$(TEST)/build
-BOCHS_CONFIG:=$(TOOLS)/bochs-config
-
-# Set cross compile tools chain
-HOME_BREW_ARM64_PATH:=/opt/homebrew/bin/
-LINUX_PATH:=/usr/bin/
-LINUX_LOCAL_PATH:=/usr/local/bin/
-
+# Target host config
 TARGET_ARCH:=x86
 #TARGET_ARCH:=arm
 #TARGET_ARCH:=risc-v
@@ -18,13 +7,28 @@ TARGET_ARCH_SUB:=i386
 #TARGET_ARCH_SUB:=x86_64
 #TARGET_ARCH_SUB:=aarch64
 
-# building host config
+# Building host config
 HOST_ARCH:=$(shell uname -m)
 HOST_KERNEL:=$(shell uname -s)
 HOST_DISTRO:=$(shell uname -n)
 
+# working tree
+SRC:=.
+BOOT:=arch/$(TARGET_ARCH)/$(TARGET_ARCH_SUB)/boot/
+TEST=../tests
+BUILD:=../build
+TOOLS:=../tools
+TEST_BUILD:=$(TEST)/build
+BOCHS_CONFIG:=$(TOOLS)/bochs-config
+
+# Set cross compile tools chain PATH
+HOME_BREW_ARM64_PATH:=/opt/homebrew/bin/
+LINUX_PATH:=/usr/bin/
+LINUX_LOCAL_PATH:=/usr/local/bin/
 BREW_LLVM_PATH:=/opt/homebrew/opt/llvm/bin/
-# Host: Apple Silicon Mac(arm64), Target: i686 (32bits)
+
+# auto config (selecting tool chain)
+# Host: Apple Silicon Mac(arm64)
 ifeq ($(HOST_KERNEL), Darwin)
 	ifeq ($(HOST_ARCH), arm64)
 		ifeq ($(TARGET_ARCH_SUB), i386)
@@ -34,11 +38,10 @@ ifeq ($(HOST_KERNEL), Darwin)
 	endif
 	AS:=$(TOOL_PATH)as
 	LD:=$(BREW_LLVM_PATH)ld.lld
-	CC:=$(BREW_LLVM_PATH)clang --target=$(TARGET_ARCH_SUB)
+	CC:=clang
 	OBJCOPY:=$(BREW_LLVM_PATH)llvm-objcopy
 	OBJDUMP:=$(BREW_LLVM_PATH)llvm-objdump
 endif
-
 ifeq ($(HOST_KERNEL), Linux) 
 	GDB:=$(LINUX_PATH)gdb
 	ifeq ($(HOST_ARCH), x86_64)
@@ -49,6 +52,18 @@ ifeq ($(HOST_KERNEL), Linux)
 			TOOL_PATH:=$(LINUX_PATH)
 		endif
 	endif
+	# using GNU toolchain under x86_64 linux host
+	AS:=$(TOOL_PATH)as
+	LD:=$(TOOL_PATH)ld
+	CC:=$(TOOL_PATH)gcc
+	OBJCOPY:=$(TOOL_PATH)objcopy
+	OBJDUMP:=$(TOOL_PATH)objdump
+	# # using clang under x86_64 linux host
+	# AS:=$(TOOL_PATH)as
+	# LD:=$(TOOL_PATH)ld.lld
+	# CC:=$(TOOL_PATH)clang
+	# OBJCOPY:=$(TOOL_PATH)llvm-objcopy
+	# OBJDUMP:=$(TOOL_PATH)llvm-objdump
 	ifeq ($(HOST_ARCH), aarch64)	
 		ifeq ($(TARGET_ARCH_SUB), i386)
 			ifeq ($(HOST_DISTRO), Asahi)
@@ -59,14 +74,8 @@ ifeq ($(HOST_KERNEL), Linux)
 				# Host: Linux (arm64), Target: i386 (32bits)
 				TOOL_PATH:=$(LINUX_PATH)i686-linux-gnu-
 			endif
-			
 		endif
 	endif
-	AS:=$(TOOL_PATH)as
-	LD:=$(TOOL_PATH)ld
-	CC:=$(TOOL_PATH)gcc
-	OBJCOPY:=$(TOOL_PATH)objcopy
-	OBJDUMP:=$(TOOL_PATH)objdump
 endif
 
 .PHONY: show_config
@@ -81,6 +90,10 @@ show_config:
 	$(info $$OBJDUMP = ${OBJDUMP})
 	$(info $$GDB = ${GDB})
 
+DEBUG:= -g
+INCLUDE:= -I $(SRC)/include/
+
+# general CFLAGS
 CFLAGS:= -fno-builtin # no built-in function in gcc
 CFLAGS+= -fno-pic # no position independent code
 CFLAGS+= -fno-pie # no position independent excutable
@@ -90,34 +103,55 @@ CFLAGS+= -fno-stack-protector # no stack protector
 CFLAGS+= -nostdinc # no standard c header
 # CFLAGS+= -nostdinc++ # no standard c++ header
 CFLAGS+= -nostdlib # no standard library
-CFLAGS+= -march=i386
-CFLAGS+= -m32 # (when using gcc target x86_64) enable i386 mode
-CFLAGS:=$(strip ${CFLAGS})
 
+# if using clang
+CFLAGS+= --target=$(TARGET_ARCH_SUB)-unknown-none-elf # using clang
+CFLAGS+= -mcpu=$(TARGET_ARCH_SUB) # using clang
+CFLAGS+= -fno-integrated-as # using clang
+
+# # if using gcc
+# CFLAGS+= -m32 # (when using gcc that target x86_64 (if target i686(already 32bits, then no need))) to enable i386 mode
+# CFLAGS+= -march=$(TARGET_ARCH_SUB)
+# CFLAGS+= -mtune=$(TARGET_ARCH_SUB) # optimize
+
+# for GNU AS
+ASFLAGS+= --32 # 32bit mode
+ASFLAGS+= -march=$(TARGET_ARCH_SUB)
+ASFLAGS+= -mtune=$(TARGET_ARCH_SUB) # optimize
+ASFLAGS+= $(DEBUG)
+
+# for both GNU LD and LLVM LD.LLD
+LDFLAGS+= -m elf_i386
+LDFLAGS+= -static
+
+# combine flags properly
+CFLAGS:=$(strip ${CFLAGS})
+ASFLAGS:=$(strip ${ASFLAGS})
+LDFLAGS:=$(strip ${LDFLAGS})
+
+# entry points for assembly
 BOOT_EP:=0x7c00
 LOADER_EP:=0x1000
 KERNEL_EP:=0x10000
 
-DEBUG:= -g
-INCLUDE:= -I $(SRC)/include/
-
-BOOT:=arch/$(TARGET_ARCH)/$(TARGET_ARCH_SUB)/boot/
 
 $(BUILD)/$(BOOT)boot.bin: $(SRC)/$(BOOT)boot.S
 	$(shell mkdir -p $(dir $@))
-	$(AS) --32 $(DEBUG) $< -o $@.o
-	$(LD) -m elf_i386 -static $@.o -o $@.elf -Ttext $(BOOT_EP)
+# $(AS) --32 $(DEBUG) $< -o $@.o
+# $(LD) -m elf_i386 -static $@.o -o $@.elf -Ttext $(BOOT_EP)
+	$(AS) $(ASFLAGS) $< -o $@.o
+	$(LD) $(LDFLAGS) $@.o -o $@.elf -Ttext $(BOOT_EP)
 	$(OBJCOPY) -O binary $@.elf $@
 
 $(BUILD)/$(BOOT)loader.bin: $(SRC)/$(BOOT)loader.S
 	$(shell mkdir -p $(dir $@))
-	$(AS) --32 $(DEBUG) $< -o $@.o
-	$(LD) -m elf_i386 -static $@.o -o $@.elf -Ttext $(LOADER_EP)
+	$(AS) $(ASFLAGS) $< -o $@.o
+	$(LD) $(LDFLAGS) $@.o -o $@.elf -Ttext $(LOADER_EP)
 	$(OBJCOPY) -O binary $@.elf $@
 
 $(BUILD)/%.o: $(SRC)/%.S
 	$(shell mkdir -p $(dir $@))
-	$(AS) --32 $(DEBUG) $< -o $@
+	$(AS) $(ASFLAGS) $< -o $@
 
 $(BUILD)/%.o: $(SRC)/%.c
 	$(shell mkdir -p $(dir $@))

@@ -23,9 +23,9 @@ Learning from [Onix](<https://github.com/StevenBaby/onix>).
 
 - [ ] Posix
 
-- [ ] Toolchain imgration/support (to Clang)
+- [x] Toolchain support (Clang)
 
-- [ ] Toolchain migration (to Rust)
+- [ ] Rust Kernel
 
 - [ ] Network Stack (TCP/IP)
 
