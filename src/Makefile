@@ -51,6 +51,7 @@ ifeq ($(HOST_KERNEL), Darwin)
 	CC:=clang
 	OBJCOPY:=$(BREW_LLVM_PATH)llvm-objcopy
 	OBJDUMP:=$(BREW_LLVM_PATH)llvm-objdump
+	NM:=$(BREW_LLVM_PATH)llvm-nm
 endif
 ifeq ($(HOST_KERNEL), Linux)
 	ifeq ($(HOST_ARCH), x86_64)
@@ -78,6 +79,7 @@ ifeq ($(HOST_KERNEL), Linux)
 	CC:=$(TOOL_PATH)gcc
 	OBJCOPY:=$(TOOL_PATH)objcopy
 	OBJDUMP:=$(TOOL_PATH)objdump
+	NM:=$(TOOL_PATH)nm
 
 	# # using clang
 	# AS:=$(TOOL_PATH)as
@@ -85,6 +87,7 @@ ifeq ($(HOST_KERNEL), Linux)
 	# CC:=$(LINUX_PATH)clang
 	# OBJCOPY:=$(LINUX_PATH)llvm-objcopy
 	# OBJDUMP:=$(LINUX_PATH)llvm-objdump
+	# NM:=$(TOOL_PATH)llvm-nm
 endif
 
 .PHONY: show_config
@@ -97,6 +100,7 @@ show_config:
 	$(info $$CC = ${CC})
 	$(info $$OBJCOPY = ${OBJCOPY})
 	$(info $$OBJDUMP = ${OBJDUMP})
+	$(info $$NM = ${NM})
 	$(info $$GDB = ${GDB})
 	$(info $$QEMU_MEM_SIZE = ${MEM_SIZE})
 
@@ -205,7 +209,7 @@ $(BUILD)/system.bin: $(BUILD)/kernel.bin
 	$(OBJCOPY) -O binary $< $@
 
 $(BUILD)/system.map: $(BUILD)/kernel.bin
-	nm $< | sort > $@
+	$(NM) $< | sort > $@
 
 $(BUILD)/master.img: $(BUILD)/$(BOOT)boot.bin \
 	$(BUILD)/$(BOOT)loader.bin \
