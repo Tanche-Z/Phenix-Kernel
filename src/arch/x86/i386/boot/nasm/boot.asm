@@ -1,4 +1,5 @@
 [org 0x7c00] ; just for NASM to output bin file (hint for assembler and linkder of base address(entry point))
+[BITS 16]
 ; Set screen mode as text mode, clear screen.
 mov ax, 3
 int 0x10
@@ -26,7 +27,7 @@ jmp 0:0x1002
 ; mov ecx, 1; start sector
 ; mov bl, 1; sector count
 ; call write_disk
-; xchg bx, bx ; bochs magic break
+
 
 jmp $ ; block
 

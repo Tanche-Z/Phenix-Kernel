@@ -4,8 +4,18 @@ TARGET_ARCH:=x86
 #TARGET_ARCH:=risc-v
 
 TARGET_ARCH_SUB:=i386
-#TARGET_ARCH_SUB:=x86_64
+# TARGET_ARCH_SUB:=x86_64
 #TARGET_ARCH_SUB:=aarch64
+
+ifeq ($(TARGET_ARCH_SUB), x86_64)
+	TARGET_CPU=x86-64
+	MEM_SIZE:=16G
+endif
+
+ifeq ($(TARGET_ARCH_SUB), i386)
+	TARGET_CPU=i386
+	MEM_SIZE:=32M
+endif
 
 # Building host config
 HOST_ARCH:=$(shell uname -m)
@@ -62,32 +72,33 @@ ifeq ($(HOST_KERNEL), Linux)
 	endif
 	GDB:=$(LINUX_PATH)gdb
 
-	# # using GNU toolchain (default)
-	# AS:=$(TOOL_PATH)as
-	# LD:=$(TOOL_PATH)ld
-	# CC:=$(TOOL_PATH)gcc
-	# OBJCOPY:=$(TOOL_PATH)objcopy
-	# OBJDUMP:=$(TOOL_PATH)objdump
-
-	# using clang
+	# using GNU toolchain (default)
 	AS:=$(TOOL_PATH)as
-	LD:=$(LINUX_PATH)ld.lld
-	CC:=$(LINUX_PATH)clang
-	OBJCOPY:=$(LINUX_PATH)llvm-objcopy
-	OBJDUMP:=$(LINUX_PATH)llvm-objdump
+	LD:=$(TOOL_PATH)ld
+	CC:=$(TOOL_PATH)gcc
+	OBJCOPY:=$(TOOL_PATH)objcopy
+	OBJDUMP:=$(TOOL_PATH)objdump
+
+	# # using clang
+	# AS:=$(TOOL_PATH)as
+	# LD:=$(LINUX_PATH)ld.lld
+	# CC:=$(LINUX_PATH)clang
+	# OBJCOPY:=$(LINUX_PATH)llvm-objcopy
+	# OBJDUMP:=$(LINUX_PATH)llvm-objdump
 endif
 
 .PHONY: show_config
 show_config:
 	$(info $$HOST_ARCH = ${HOST_ARCH})
 	$(info $$HOST_KERNEL = ${HOST_KERNEL})
-	$(info $$TARGET_ARCH = ${TARGET_ARCH})
+	$(info $$TARGET_ARCH = ${TARGET_CPU})
 	$(info $$AS = ${AS})
 	$(info $$LD = ${LD})
 	$(info $$CC = ${CC})
 	$(info $$OBJCOPY = ${OBJCOPY})
 	$(info $$OBJDUMP = ${OBJDUMP})
 	$(info $$GDB = ${GDB})
+	$(info $$QEMU_MEM_SIZE = ${MEM_SIZE})
 
 DEBUG:= -g
 INCLUDE:= -I $(SRC)/include/
@@ -104,9 +115,21 @@ CFLAGS+= -nostdinc # no standard c header
 CFLAGS+= -nostdlib # no standard library
 
 # using gcc (default)
-CFLAGS+= -m32 # (when using gcc that target x86_64 (if target i686(already 32bits, then no need))) to enable i386 mode
-CFLAGS+= -march=$(TARGET_ARCH_SUB)
-CFLAGS+= -mtune=$(TARGET_ARCH_SUB) # optimize
+ifeq ($(TARGET_ARCH_SUB), i386)
+	CFLAGS+= -m32 # (when using gcc that target x86_64 (if target i686(already 32bits, then no need))) to enable i386 mode
+	CFLAGS+= -march=$(TARGET_CPU)
+	CFLAGS+= -mtune=$(TARGET_CPU) # optimize
+endif
+ifeq ($(TARGET_ARCH_SUB), x86_64)
+	CFLAGS+= -m64
+	ifeq ($(HOST_ARCH), x86_64)
+		CFLAGS+= -march=native
+		# CFLAGS+= -mtune=$(TARGET_CPU)
+	endif
+	ifneq ($(HOST_ARCH), x86_64)
+		CFLAGS+= -march=$(TARGET_CPU)
+	endif
+endif
 
 # # if using clang
 # CFLAGS+= --target=$(TARGET_ARCH_SUB)-unknown-none-elf # using clang
@@ -114,13 +137,18 @@ CFLAGS+= -mtune=$(TARGET_ARCH_SUB) # optimize
 # CFLAGS+= -fno-integrated-as # using clang
 
 # for GNU AS
-ASFLAGS+= --32 # 32bit mode
-ASFLAGS+= -march=$(TARGET_ARCH_SUB)
-ASFLAGS+= -mtune=$(TARGET_ARCH_SUB) # optimize
+ifeq ($(TARGET_ARCH_SUB), i386)
+	ASFLAGS+= --32 # 32bit mode
+	ASFLAGS+= -march=$(TARGET_CPU)
+	ASFLAGS+= -mtune=$(TARGET_CPU) # optimize
+endif
 ASFLAGS+= $(DEBUG)
 
+# ASFLAGS+= -mmnemonic=intel # default: att
+# ASFLAGS+= -msyntax=intel # default: att
+
 # for both GNU LD and LLVM LD.LLD
-LDFLAGS+= -m elf_i386
+LDFLAGS+= -m elf_$(TARGET_ARCH_SUB)
 LDFLAGS+= -static
 
 # combine flags properly
@@ -132,6 +160,13 @@ LDFLAGS:=$(strip ${LDFLAGS})
 BOOT_EP:=0x7c00
 LOADER_EP:=0x1000
 KERNEL_EP:=0x10000
+
+
+# # long mode test using nasm
+# BOOT:=arch/$(TARGET_ARCH)/$(TARGET_ARCH_SUB)/boot/nasm/
+# $(BUILD)/$(BOOT)%.bin: $(SRC)/$(BOOT)%.asm
+# 	$(shell mkdir -p $(dir $@))
+# 	nasm -f bin -i $(BOOT) $< -o $@
 
 # building from source
 $(BUILD)/$(BOOT)boot.bin: $(SRC)/$(BOOT)boot.S
@@ -164,7 +199,7 @@ $(BUILD)/kernel.bin: \
 	$(BUILD)/lib/vsprintf.o
 
 	$(shell mkdir -p $(dir $@))
-	$(LD) -m elf_i386 -static $^ -o $@ -Ttext $(KERNEL_EP)
+	$(LD) -m elf_$(TARGET_ARCH_SUB) -static $^ -o $@ -Ttext $(KERNEL_EP)
 
 $(BUILD)/system.bin: $(BUILD)/kernel.bin
 	$(OBJCOPY) -O binary $< $@
@@ -178,35 +213,40 @@ $(BUILD)/master.img: $(BUILD)/$(BOOT)boot.bin \
 	$(BUILD)/system.map
 
 # yes | bximage -q -func=create -hd=16  -sectsize=512 -imgmode=flat $@
-
 	qemu-img create -o size=16M $@ 
 	dd if=$(BUILD)/$(BOOT)boot.bin of=$@ bs=512 count=1 conv=notrunc
 	dd if=$(BUILD)/$(BOOT)loader.bin of=$@ bs=512 count=4 seek=2 conv=notrunc
 	dd if=$(BUILD)/system.bin of=$@ bs=512 count=200 seek=10 conv=notrunc
+
+# # long mode test...
+# $(BUILD)/master.img: $(BUILD)/$(BOOT)boot.bin \
+# 	$(BUILD)/system.bin \
+# 	$(BUILD)/system.map
+
+# 	qemu-img create -o size=16M $@ 
+# 	dd if=$(BUILD)/$(BOOT)boot.bin of=$@ bs=512 count=1 conv=notrunc
+# 	dd if=$(BUILD)/system.bin of=$@ bs=512 count=200 seek=10 conv=notrunc
 
 .PHONY: clean
 clean:
 	rm -rf $(BUILD); \
 	rm $(SRC)/bochsrc*;
 
+QEMU_BOOT_OPTIONS+= -m $(MEM_SIZE)
+QEMU_BOOT_OPTIONS+= -boot c
+QEMU_BOOT_OPTIONS:= $(strip ${QEMU_BOOT_OPTIONS})
+
 .PHONY: qemu
 qemu: $(BUILD)/master.img
-	qemu-system-i386 \
-	-m 32M \
-	-boot c \
-	-hda $<
+	qemu-system-$(TARGET_ARCH_SUB) $(QEMU_BOOT_OPTIONS) -hda $<
 
 .PHONY: qemu-gdb
 qemu-gdb: $(BUILD)/master.img
-	qemu-system-i386 \
-	-s -S \
-	-m 32M \
-	-boot c \
-	-hda $<
+	qemu-system-$(TARGET_ARCH_SUB) $(QEMU_BOOT_OPTIONS) -hda $< -s -S
 
 .PHONY: disam-boot
 disam_boot:
-	$(OBJDUMP) -D -b binary -m i386:x86-64 $(BUILD)/boot/boot.bin
+	$(OBJDUMP) -D -b binary -m $(TARGET_ARCH_SUB):x86-64 $(BUILD)/boot/boot.bin
 
 # Bochs X11 gui-debug
 .PHONY: bochs

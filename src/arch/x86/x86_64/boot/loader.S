@@ -58,18 +58,82 @@ detect_memory:
 
     jmp pre_protected_mode
 
+.align 4
+idt:
+    .word 0
+    .long 0
+
 pre_protected_mode:
     cli # clear interrupt
     # open the A20
     in $0x92, %al
     or $0b10, %al
     out %al, $0x92
+
+    push %di
+    mov $0x1000, %ecx
+    xor %eax, %eax
+    cld
+    rep stosl
+    pop %di
+
+    lea %es:0x1000(%di), %eax
+    or $0b10, %eax
+    mov %eax, %es:(%di)
+
+    lea %es:0x2000(%di), %eax
+    or $0b10, %eax
+    mov %eax, %es:0x1000(%di)
+
+    lea %es:0x3000(%di), %eax
+    or $0b10, %eax
+    mov %eax, %es:0x2000(%di)
+
+    push %di
+    lea 0x3000(%di), %di
+    mov 0b10, %eax
+
+.looppagetable:
+    mov %eax, %es:(%di)
+    add $0x1000, %eax
+    add $8, %di
+    cmp 0x200000, %eax
+    jb .looppagetable
+
+    pop %di
+
+    mov $0xff, %al
+    out %al, 0xa1
+    out %al, 0x21
+
+    nop
+    nop
+
+    lidt idt
+
+    # enter long mode
+    mov $10100000b, %eax
+    mov %eax, %cr4
+
+    mov %edi, %edx
+    mov %edx, %cr0
+
+    mov $0xc0000080, %eax
+    rdmsr
+
+    or $0x00000100, %eax
+    wrmsr
+
+    mov %cr0, %ebx
+    or $0x80000001, %ebx
+    mov %ebx, %cr0
+
     lgdtl gdt_ptr # load GDT
     # PE(Protect Enable) (set cr0 to 1)
-    mov %cr0, %eax
-    or $1, %eax
-    mov %eax, %cr0
-    ljmp $code_selector, $protect_mode # use jmp to refresh cache
+    // mov %cr0, %eax
+    // or $1, %eax
+    // mov %eax, %cr0
+    ljmp $code_selector, $long_mode # use jmp to refresh cache
 
 # pirnt in Real Mode
 print:
@@ -97,11 +161,8 @@ error:
     .msg:
         .asciz "Loading Error!!!\n\r"
 
-
-// code bening trunc!!! No high bits
-// why???
-    .code32
-protect_mode:
+    .code64
+long_mode:
     mov $data_selector, %ax
     mov %ax, %ds
     mov %ax, %es
@@ -109,19 +170,25 @@ protect_mode:
     mov %ax, %gs
     mov %ax, %ss # initialize segment register
 
-    // # Reset first char in display with 'P', indicating entered Proteted Mode
-    // movb $0x50, 0xb8000
-    // movb $0x50, 0x200000
+    // mov $0x10000, %esp # set stack top
 
-    mov $0x10000, %esp # set stack top
+    # clean screen with blue color
+    mov $0xb8000, %edi
+    mov $500, %rcx # count/4 (uint64_t)
+    mov $0x1F201F201F201F20, %rax # set blue background, white foreground, blank spaces
+    rep stosq # clear entire screen
 
-    mov $0x10000, %edi # read target memory (kernel)
-    mov $10, %ecx # start sector
-    mov $200, %bl # sector count
-    call read_disk
+    # Reset first char in display with 'L', indicating entered Long Mode
+    movb $0x4C	, 0xb8000
+    movb $0x4C	, 0x200000
 
-    ljmp $code_selector, $0x10000 # go to kernel
-    ud2 # means error occur (should never excute to here) (if here, error occur)
+    // mov $0x10000, %edi # read target memory (kernel)
+    // mov $10, %rcx # start sector
+    // mov $200, %bl # sector count
+    // call read_disk
+
+    // ljmp $code_selector, $0x10000 # go to kernel
+    // ud2 # means error occur (should never excute to here) (if here, error occur)
 jmp .
 
 read_disk:
@@ -198,27 +265,20 @@ code_selector = gdt_code - gdt_base
 data_selector = gdt_data - gdt_base
 
 gdt_ptr:
-    .word (gdt_end - gdt_base) - 1
-    .long gdt_base
+    .word (gdt_end - gdt_base) - 1 # 16-bit Size (Limit) of GDT.
+    .long gdt_base # 32-bit Base Address of GDT. (CPU will zero extend to 64-bit)
 
 gdt_base:
-    .long 0, 0
+    .quad 0x0000000000000000 
 
 gdt_code:
-    .word 0xffff
-    .word 0x00
-    .byte 0x00
-    .byte 0b10011010
-    .byte 0b11000000
-    .byte 0x00
+    .quad 0x00209A0000000000 # 64-bit code descriptor (exec/read)
 
 gdt_data:
-    .word 0xffff
-    .word 0x00
-    .byte 0x00
-    .byte 0b10010010
-    .byte 0b11000000
-    .byte 0x00
+    .quad 0x0000920000000000 # 64-bit data descriptor (read/write)
+
+.align 4
+    .long 0 # Padding to make the "address of the GDT" field aligned on a 4-byte boundary
 
 gdt_end:
 
