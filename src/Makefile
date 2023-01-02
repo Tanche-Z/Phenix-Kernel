@@ -1,3 +1,6 @@
+# TOOL_CHAIN=GNU
+TOOL_CHAIN=LLVM
+
 # Target host config
 TARGET_ARCH:=x86
 #TARGET_ARCH:=arm
@@ -74,20 +77,24 @@ ifeq ($(HOST_KERNEL), Linux)
 	GDB:=$(LINUX_PATH)gdb
 
 	# using GNU toolchain (default)
-	AS:=$(TOOL_PATH)as
-	LD:=$(TOOL_PATH)ld
-	CC:=$(TOOL_PATH)gcc
-	OBJCOPY:=$(TOOL_PATH)objcopy
-	OBJDUMP:=$(TOOL_PATH)objdump
-	NM:=$(TOOL_PATH)nm
+	ifeq ($(TOOL_CHAIN), GNU)
+		AS:=$(TOOL_PATH)as
+		LD:=$(TOOL_PATH)ld
+		CC:=$(TOOL_PATH)gcc
+		OBJCOPY:=$(TOOL_PATH)objcopy
+		OBJDUMP:=$(TOOL_PATH)objdump
+		NM:=$(TOOL_PATH)nm
+	endif
 
 	# # using clang
-	# AS:=$(TOOL_PATH)as
-	# LD:=$(LINUX_PATH)ld.lld
-	# CC:=$(LINUX_PATH)clang
-	# OBJCOPY:=$(LINUX_PATH)llvm-objcopy
-	# OBJDUMP:=$(LINUX_PATH)llvm-objdump
-	# NM:=$(TOOL_PATH)llvm-nm
+	ifeq ($(TOOL_CHAIN), LLVM)
+		AS:=$(TOOL_PATH)as
+		LD:=$(LINUX_PATH)ld.lld
+		CC:=$(LINUX_PATH)clang
+		OBJCOPY:=$(LINUX_PATH)llvm-objcopy
+		OBJDUMP:=$(LINUX_PATH)llvm-objdump
+		NM:=$(TOOL_PATH)llvm-nm
+	endif
 endif
 
 .PHONY: show_config
@@ -119,26 +126,30 @@ CFLAGS+= -nostdinc # no standard c header
 CFLAGS+= -nostdlib # no standard library
 
 # using gcc (default)
-ifeq ($(TARGET_ARCH_SUB), i386)
-	CFLAGS+= -m32 # (when using gcc that target x86_64 (if target i686(already 32bits, then no need))) to enable i386 mode
-	CFLAGS+= -march=$(TARGET_CPU)
-	CFLAGS+= -mtune=$(TARGET_CPU) # optimize
-endif
-ifeq ($(TARGET_ARCH_SUB), x86_64)
-	CFLAGS+= -m64
-	ifeq ($(HOST_ARCH), x86_64)
-		CFLAGS+= -march=native
-		# CFLAGS+= -mtune=$(TARGET_CPU)
-	endif
-	ifneq ($(HOST_ARCH), x86_64)
+ifeq ($(TOOL_CHAIN), GNU)
+	ifeq ($(TARGET_ARCH_SUB), i386)
+		CFLAGS+= -m32 # (when using gcc that target x86_64 (if target i686(already 32bits, then no need))) to enable i386 mode
 		CFLAGS+= -march=$(TARGET_CPU)
+		CFLAGS+= -mtune=$(TARGET_CPU) # optimize
+	endif
+	ifeq ($(TARGET_ARCH_SUB), x86_64)
+		CFLAGS+= -m64
+		ifeq ($(HOST_ARCH), x86_64)
+			CFLAGS+= -march=native
+			# CFLAGS+= -mtune=$(TARGET_CPU)
+		endif
+		ifneq ($(HOST_ARCH), x86_64)
+			CFLAGS+= -march=$(TARGET_CPU)
+		endif
 	endif
 endif
 
-# # if using clang
-# CFLAGS+= --target=$(TARGET_ARCH_SUB)-unknown-none-elf # using clang
-# CFLAGS+= -mcpu=$(TARGET_ARCH_SUB) # using clang
-# CFLAGS+= -fno-integrated-as # using clang
+# if using clang
+ifeq ($(TOOL_CHAIN), LLVM)
+CFLAGS+= --target=$(TARGET_ARCH_SUB)-unknown-none-elf # using clang
+CFLAGS+= -mcpu=$(TARGET_ARCH_SUB) # using clang
+CFLAGS+= -fno-integrated-as # using clang
+endif
 
 # for GNU AS
 ifeq ($(TARGET_ARCH_SUB), i386)
