@@ -1,17 +1,5 @@
 {
     "configurations": [
-        // {
-        //     "name": "Debian_Linux_x86_64",
-        //     "includePath": [
-        //         "${workspaceFolder}/**",
-        //         "${workspaceFolder}/include/"
-        //     ],
-        //     "defines": [],
-        //     "compilerPath": "/usr/bin/i686-linux-gnu-gcc",
-        //     "cStandard": "c17",
-        //     "cppStandard": "c++20",
-        //     "intelliSenseMode": "gcc-x86"
-        // },
         {
             "name": "Arch_Linux_x86_64",
             "includePath": [
