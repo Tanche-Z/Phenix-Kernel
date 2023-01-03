@@ -1,13 +1,25 @@
 {
     "configurations": [
+        // {
+        //     "name": "Arch_Linux_x86_64",
+        //     "includePath": [
+        //         "${workspaceFolder}/**",
+        //         "${workspaceFolder}/src/include/"
+        //     ],
+        //     "defines": [],
+        //     "compilerPath": "/usr/local/bin/x86_64-elf-gcc",
+        //     "cStandard": "c17",
+        //     "cppStandard": "c++20",
+        //     "intelliSenseMode": "gcc-x86"
+        // }
         {
-            "name": "Arch_Linux_x86_64",
+            "name": "MacOS_aarch64",
             "includePath": [
                 "${workspaceFolder}/**",
                 "${workspaceFolder}/src/include/"
             ],
             "defines": [],
-            "compilerPath": "/usr/bin/gcc",
+            "compilerPath": "/opt/homebrew/bin/x86_64-elf-gcc",
             "cStandard": "c17",
             "cppStandard": "c++20",
             "intelliSenseMode": "gcc-x86"
