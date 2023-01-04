@@ -26,11 +26,11 @@ HOST_KERNEL:=$(shell uname -s)
 HOST_DISTRO:=$(shell uname -n)
 
 # working tree
-SRC:=.
+SRC:=src
 BOOT:=arch/$(TARGET_ARCH)/$(TARGET_ARCH_SUB)/boot/
-TEST=../tests
-BUILD:=../build
-TOOLS:=../tools
+TEST=tests
+BUILD:=build
+TOOLS:=tools
 TEST_BUILD:=$(TEST)/build
 BOCHS_CONFIG:=$(TOOLS)/bochs-config
 
@@ -124,6 +124,7 @@ CFLAGS+= -fno-stack-protector # no stack protector
 CFLAGS+= -nostdinc # no standard c header
 # CFLAGS+= -nostdinc++ # no standard c++ header
 CFLAGS+= -nostdlib # no standard library
+CFLAGS+= -O0 # disable all optimization
 
 # using gcc (default)
 ifeq ($(TOOL_CHAIN), GNU)
@@ -146,9 +147,9 @@ endif
 
 # if using clang
 ifeq ($(TOOL_CHAIN), LLVM)
-CFLAGS+= --target=$(TARGET_ARCH_SUB)-unknown-none-elf # using clang
-CFLAGS+= -mcpu=$(TARGET_ARCH_SUB) # using clang
-CFLAGS+= -fno-integrated-as # using clang
+CFLAGS+= --target=$(TARGET_ARCH_SUB)-unknown-none-elf
+CFLAGS+= -mcpu=$(TARGET_ARCH_SUB)
+# CFLAGS+= -fno-integrated-as # comment when buidling on MacOS
 endif
 
 # for GNU AS
