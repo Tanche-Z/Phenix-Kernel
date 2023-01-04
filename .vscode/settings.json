@@ -3,6 +3,8 @@
         "*.txt": "plaintext",
         "types.h": "c",
         "stdio.h": "c",
-        "console.h": "c"
+        "console.h": "c",
+        "printk.h": "c",
+        "assert.h": "c"
     }
 }
