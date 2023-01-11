@@ -29,13 +29,6 @@
             // "miDebuggerPath": "/usr/local/bin/i686-elf-gdb" // for x86_64 env debugging
             // "miDebuggerPath": "/opt/homebrew/bin/x86_64-elf-gdb" // for m1 Mac (arch64) env debugging
         },
-        {
-            "name": "Documentation index",
-            "type": "chrome",
-            "request": "launch",
-            "file": "${workspaceFolder}/Documentation/_build/html/index.html",
-            // "url": "http://localhost:8000"
-          }
         // {
         //     "name": "ph1nix kernel lldb", // LLDB debugging require CodeLLDB extention which can find in VScode Marketplace
         //     "type": "lldb",
