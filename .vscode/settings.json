@@ -6,5 +6,6 @@
         "console.h": "c",
         "printk.h": "c",
         "assert.h": "c"
-    }
+    },
+    "esbonio.sphinx.confDir": ""
 }

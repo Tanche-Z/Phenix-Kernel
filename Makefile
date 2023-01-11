@@ -1,5 +1,5 @@
-# TOOL_CHAIN=GNU
-TOOL_CHAIN=LLVM
+TOOL_CHAIN=GNU
+# TOOL_CHAIN=LLVM
 
 # Target host config
 TARGET_ARCH:=x86
@@ -131,13 +131,13 @@ ifeq ($(TOOL_CHAIN), GNU)
 	ifeq ($(TARGET_ARCH_SUB), i386)
 		CFLAGS+= -m32 # (when using gcc that target x86_64 (if target i686(already 32bits, then no need))) to enable i386 mode
 		CFLAGS+= -march=$(TARGET_CPU)
-		CFLAGS+= -mtune=$(TARGET_CPU) # optimize
+# CFLAGS+= -mtune=$(TARGET_CPU) # optimize (will be ignored if march has set)
 	endif
 	ifeq ($(TARGET_ARCH_SUB), x86_64)
 		CFLAGS+= -m64
 		ifeq ($(HOST_ARCH), x86_64)
 			CFLAGS+= -march=native
-			# CFLAGS+= -mtune=$(TARGET_CPU)
+# CFLAGS+= -mtune=$(TARGET_CPU)
 		endif
 		ifneq ($(HOST_ARCH), x86_64)
 			CFLAGS+= -march=$(TARGET_CPU)
