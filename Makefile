@@ -1,3 +1,4 @@
+# default tool chain is GNU
 TOOL_CHAIN=GNU
 # TOOL_CHAIN=LLVM
 
@@ -112,6 +113,7 @@ show_config:
 	$(info $$QEMU_MEM_SIZE = ${MEM_SIZE})
 
 DEBUG:= -g
+# DEBUG:= -gstabs
 INCLUDE:= -I $(SRC)/include/
 
 # general CFLAGS
@@ -157,8 +159,10 @@ ifeq ($(TARGET_ARCH_SUB), i386)
 	ASFLAGS+= --32 # 32bit mode
 	ASFLAGS+= -march=$(TARGET_CPU)
 	ASFLAGS+= -mtune=$(TARGET_CPU) # optimize
+	ASFLAGS+= -O0
 endif
 ASFLAGS+= $(DEBUG)
+# ASFLAGS+= --gstabs
 
 # ASFLAGS+= -mmnemonic=intel # default: att
 # ASFLAGS+= -msyntax=intel # default: att
@@ -247,7 +251,7 @@ $(BUILD)/master.img: $(BUILD)/$(BOOT)boot.bin \
 .PHONY: clean
 clean:
 	rm -rf $(BUILD); \
-	rm $(SRC)/bochsrc*;
+	rm -f $(SRC)/bochsrc*;
 
 QEMU_BOOT_OPTIONS+= -m $(MEM_SIZE)
 QEMU_BOOT_OPTIONS+= -boot c

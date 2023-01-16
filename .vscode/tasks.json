@@ -1,130 +1,56 @@
 {
     "tasks": [
         {
-            "type": "shell", // allow debug assembly
-            "label": "C/C++: gcc build active file",
+            "label": "clean build",
+            "type": "shell",
             "command": "",
             "args": [
-                "mkdir",
-                "-p",
-                "${workspaceFolder}/build/test_debug",
-                ";",
-                "/usr/bin/gcc",
-                "-fdiagnostics-color=always",
-                "-m32",
-                "-g",
-                "-I${workspaceFolder}/include",
-                "${file}",
-                "-o",
-                "${workspaceFolder}/build/test_debug/${fileBasenameNoExtension}.out"
+                "make",
+                "clean",
             ],
             "options": {
-                "cwd": "${fileDirname}"
+                "cwd": "${workspaceFolder}"
             },
-            "problemMatcher": [
-                "$gcc"
-            ],
             "group": {
                 "kind": "build",
-                "isDefault": true
+                // "isDefault": true
             },
-            "detail": "Build 32bits .out file using gcc."
+            "detail": "clean build files"
         },
         {
+            "label": "qemu gdb",
             "type": "shell",
-            "label": "nasm: gcc build active file",
             "command": "",
             "args": [
-                "mkdir",
-                "-p",
-                "${workspaceFolder}/build/test_debug",
-                ";",
-                "/usr/bin/nasm",
-                "-f",
-                "elf32",
-                "-g",
-                "${file}",
-                "-o",
-                "${workspaceFolder}/build/test_debug/${fileBasenameNoExtension}.o",
-                ";",
-                "/usr/bin/gcc",
-                "-fdiagnostics-color=always",
-                "-m32",
-                "-g",
-                "-static",
-                "-I${workspaceFolder}/include",
-                "${workspaceFolder}/build/test_debug/${fileBasenameNoExtension}.o",
-                "-o",
-                "${workspaceFolder}/build/test_debug/${fileBasenameNoExtension}.out"
+                "make",
+                "qemu-gdb",
             ],
             "options": {
-                "cwd": "${fileDirname}"
+                "cwd": "${workspaceFolder}"
             },
+            "group": {
+                "kind": "build",
+            },
+            "detail": "qemu debug",
+            "isBackground": true, // run in backgroung so when qemu waiting for gdb connection, the lauch can be keep processed
             "problemMatcher": [
-                "$gcc"
+                {
+                    "pattern": [
+                        {
+                            "regexp": ".",
+                            "file": 1,
+                            "location": 2,
+                            "message": 3
+                        }
+                    ],
+                    "background": { // handle backfround task
+                        "activeOnStart": true,
+                        "beginsPattern": ".",
+                        "endsPattern": "."
+                    }
+                }
             ],
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            },
-            "detail": "Build 32bits elf file using nasm & gcc."
-        },
-        {
-            "type": "shell",
-            "label": "C/C++: clang build active file", // LLDB debugging require CodeLLDB extention which can find in VScode Marketplace
-            "command": "/usr/bin/clang",
-            "args": [
-                "-fdiagnostics-color=always",
-                "-m32",
-                "-g",
-                "-I${workspaceFolder}/include",
-                "${file}",
-                "-o",
-                "${fileDirname}/${fileBasenameNoExtension}.out"
-            ],
-            "options": {
-                "cwd": "${fileDirname}"
-            },
-            "problemMatcher": ["$gcc"],
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            }
-        },
-        {
-            "type": "shell",
-            "label": "nasm: clang build active file", // LLDB debugging require CodeLLDB extention which can find in VScode Marketplace
-            "command": "",
-            "args": [
-                "/usr/bin/nasm",
-                "-f",
-                "elf32",
-                "-g",
-                "${file}",
-                "-o",
-                "${fileDirname}/${fileBasenameNoExtension}.o",
-                ";",
-                "/usr/bin/clang",
-                "-fdiagnostics-color=always",
-                "-m32",
-                "-g",
-                "-static",
-                "-I${workspaceFolder}/include",
-                "${fileDirname}/${fileBasenameNoExtension}.o",
-                "-o",
-                "${fileDirname}/${fileBasenameNoExtension}.out"
-            ],
-            "options": {
-                "cwd": "${fileDirname}"
-            },
-            "problemMatcher": [
-                "$gcc"
-            ],
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            },
-            "detail": "Task generated by Debugger."
+            "dependsOn": "clean build"
         },
     ],
     "version": "2.0.0"
