@@ -50,6 +50,7 @@ ifeq ($(HOST_KERNEL), Darwin)
 		GDB:=$(HOME_BREW_ARM64_PATH)$(TARGET_ARCH_SUB)-elf-gdb
 		endif
 	endif
+	TOOL_CHAIN=LLVM
 	AS:=$(TOOL_PATH)as
 	LD:=$(BREW_LLVM_PATH)ld.lld
 	CC:=clang
