@@ -5,6 +5,7 @@
 
 #include <ph1nix/stdarg.h>
 #include <ph1nix/string.h>
+#include <ph1nix/assert.h>
 
 #define ZEROPAD 1 // padding zero
 #define SIGN 2 // unsigned/signed long
@@ -328,7 +329,9 @@ int vsprintf(char *buf, const char *fmt, va_list args)
     *str = '\0';
 
     // return the length of preccessed string
-    return str - buf;
+    i = str - buf;
+    assert(i < 1024);
+    return i;
 }
 
 int sprintf(char *buf, const char *fmt, ...)
