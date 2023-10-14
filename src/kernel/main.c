@@ -7,17 +7,18 @@
 // #include <ph1nix/printk.h>
 #include <ph1nix/assert.h>
 #include <ph1nix/debug.h>
+#include <ph1nix/global.h>
 
 // char msg[] = "hello ph1nix!!!!\n";
 // char buf[1024];
 
 void _kernel_init()
 {
-    // console_init();
+    console_init(); // clear console
 
-    BMB;
+    // DEBUGK("debug ph1nix!!!\n"); 
 
-    DEBUGK("debug ph1nix!!!\n");
+    gdt_init();
 
     return;
 }

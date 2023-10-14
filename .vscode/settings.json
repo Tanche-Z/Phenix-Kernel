@@ -1,3 +1,8 @@
 {
+    "files.associations": {
+        "*.txt": "plaintext",
+        "debug.h": "c",
+        "string.h": "c"
+    }
     
 }

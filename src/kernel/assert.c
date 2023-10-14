@@ -1,5 +1,5 @@
 #include <ph1nix/types.h>
-// #include <ph1nix/printk.h>
+#include <ph1nix/printk.h>
 #include <ph1nix/stdio.h>
 #include <ph1nix/assert.h>
 

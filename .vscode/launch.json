@@ -25,7 +25,8 @@
                     "ignoreFailures": true
                 }
             ],
-            "miDebuggerPath": "/usr/bin/gdb", // for x86_64 env debugging
+            // "miDebuggerPath": "/usr/bin/gdb", // for x86_64 env debugging
+            "miDebuggerPath": "/opt/homebrew/bin/x86_64-elf-gdb", // for macos env debugging
             "externalConsole": false,
         },
     ]
