@@ -2,7 +2,8 @@
     "files.associations": {
         "*.txt": "plaintext",
         "debug.h": "c",
-        "string.h": "c"
+        "string.h": "c",
+        "task.h": "c"
     }
     
 }

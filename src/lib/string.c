@@ -67,6 +67,7 @@ char *strchr(const char *str, int ch)
             return _NULL;
         }
     }
+    return _NULL;
 }
 
 // find char (last(most right)))
@@ -133,4 +134,5 @@ void *memchr(const void *str, int ch, size_t count) // find char in a block of m
         }
         ptr++;
     }
+    return 0;
 }

@@ -50,13 +50,13 @@ ifeq ($(HOST_KERNEL), Darwin)
 		GDB:=$(HOME_BREW_ARM64_PATH)$(TARGET_ARCH_SUB)-elf-gdb
 		endif
 	endif
-	TOOL_CHAIN=LLVM
-	AS:=$(TOOL_PATH)as
-	LD:=$(BREW_LLVM_PATH)ld.lld
-	CC:=clang
-	OBJCOPY:=$(BREW_LLVM_PATH)llvm-objcopy
-	OBJDUMP:=$(BREW_LLVM_PATH)llvm-objdump
-	NM:=$(BREW_LLVM_PATH)llvm-nm
+# TOOL_CHAIN=LLVM
+# AS:=$(TOOL_PATH)as
+# LD:=$(BREW_LLVM_PATH)ld.lld
+# CC:=clang
+# OBJCOPY:=$(BREW_LLVM_PATH)llvm-objcopy
+# OBJDUMP:=$(BREW_LLVM_PATH)llvm-objdump
+# NM:=$(BREW_LLVM_PATH)llvm-nm
 endif
 ifeq ($(HOST_KERNEL), Linux)
 	ifeq ($(HOST_ARCH), x86_64)
@@ -77,26 +77,26 @@ ifeq ($(HOST_KERNEL), Linux)
 		endif
 	endif
 	GDB:=$(LINUX_PATH)gdb
+endif
 
-	# using GNU toolchain (default)
-	ifeq ($(TOOL_CHAIN), GNU)
-		AS:=$(TOOL_PATH)as
-		LD:=$(TOOL_PATH)ld
-		CC:=$(TOOL_PATH)gcc
-		OBJCOPY:=$(TOOL_PATH)objcopy
-		OBJDUMP:=$(TOOL_PATH)objdump
-		NM:=$(TOOL_PATH)nm
-	endif
+# using GNU toolchain (default)
+ifeq ($(TOOL_CHAIN), GNU)
+	AS:=$(TOOL_PATH)as
+	LD:=$(TOOL_PATH)ld
+	CC:=$(TOOL_PATH)gcc
+	OBJCOPY:=$(TOOL_PATH)objcopy
+	OBJDUMP:=$(TOOL_PATH)objdump
+	NM:=$(TOOL_PATH)nm
+endif
 
-	# # using clang
-	ifeq ($(TOOL_CHAIN), LLVM)
-		AS:=$(TOOL_PATH)as
-		LD:=$(LINUX_PATH)ld.lld
-		CC:=$(LINUX_PATH)clang
-		OBJCOPY:=$(LINUX_PATH)llvm-objcopy
-		OBJDUMP:=$(LINUX_PATH)llvm-objdump
-		NM:=$(TOOL_PATH)llvm-nm
-	endif
+# # using clang
+ifeq ($(TOOL_CHAIN), LLVM)
+	AS:=$(TOOL_PATH)as
+	LD:=$(LINUX_PATH)ld.lld
+	CC:=$(LINUX_PATH)clang
+	OBJCOPY:=$(LINUX_PATH)llvm-objcopy
+	OBJDUMP:=$(LINUX_PATH)llvm-objdump
+	NM:=$(TOOL_PATH)llvm-nm
 endif
 
 .PHONY: show_config
@@ -151,7 +151,7 @@ endif
 # if using clang
 ifeq ($(TOOL_CHAIN), LLVM)
 CFLAGS+= --target=$(TARGET_ARCH_SUB)-unknown-none-elf
-CFLAGS+= -mcpu=$(TARGET_ARCH_SUB)
+# CFLAGS+= -mcpu=$(TARGET_ARCH_SUB)
 # CFLAGS+= -fno-integrated-as # comment when buidling on MacOS
 endif
 
@@ -182,12 +182,14 @@ BOOT_EP:=0x7c00
 LOADER_EP:=0x1000
 KERNEL_EP:=0x10000
 
-
-# # long mode test using nasm
+# # # long mode test using nasm
 # BOOT:=arch/$(TARGET_ARCH)/$(TARGET_ARCH_SUB)/boot/nasm/
 # $(BUILD)/$(BOOT)%.bin: $(SRC)/$(BOOT)%.asm
 # 	$(shell mkdir -p $(dir $@))
 # 	nasm -f bin -i $(BOOT) $< -o $@
+# $(BUILD)/%.o: $(SRC)/%.asm
+# 	$(shell mkdir -p $(dir $@))
+# 	nasm -f elf32 $(DEBUG) $< -o $@
 
 # building from source
 $(BUILD)/$(BOOT)boot.bin: $(SRC)/$(BOOT)boot.S
@@ -219,6 +221,8 @@ $(BUILD)/kernel.bin: \
 	$(BUILD)/kernel/assert.o \
 	$(BUILD)/kernel/debug.o \
 	$(BUILD)/kernel/global.o \
+	$(BUILD)/kernel/task.o \
+	$(BUILD)/kernel/schedule.o \
 	$(BUILD)/lib/string.o \
 	$(BUILD)/lib/vsprintf.o
 
